@@ -1,10 +1,72 @@
-// Утилиты для работы с Browser Web Notifications API, Web Push и Capacitor Native Notifications
+// Утилиты для работы с Browser Web Notifications API, Web Push, LocalNotifications и FCM Push
 import { api } from '../api';
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 let channelCreated = false;
 let listenersInitialized = false;
+let fcmInitialized = false;
+
+// Инициализация системного Firebase Cloud Messaging для закрытого приложения
+export async function initPushNotifications() {
+  if (!Capacitor.isNativePlatform() || fcmInitialized) return;
+
+  try {
+    const permStatus = await PushNotifications.checkPermissions();
+    if (permStatus.receive === 'prompt') {
+      const requested = await PushNotifications.requestPermissions();
+      if (requested.receive !== 'granted') return;
+    } else if (permStatus.receive !== 'granted') {
+      return;
+    }
+
+    fcmInitialized = true;
+
+    // Регистрация токена устройства
+    PushNotifications.addListener('registration', async (token) => {
+      console.log('🔥 Получен FCM Push-токен устройства:', token.value);
+      try {
+        await api.saveFcmToken(token.value, 'Android Phone');
+      } catch (err) {
+        console.warn('Ошибка отправки FCM токена на сервер:', err);
+      }
+    });
+
+    PushNotifications.addListener('registrationError', (err) => {
+      console.warn('FCM registration error:', err.error);
+    });
+
+    // Обработка уведомления, если приложение открыто
+    PushNotifications.addListener('pushNotificationReceived', (notification) => {
+      console.log('FCM push получен в активном приложении:', notification);
+    });
+
+    // Обработка клика по системному пушу из шторки (когда приложение было закрыто)
+    PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+      const data = action.notification?.data;
+      if (!data) return;
+
+      if (data.type === 'requests') {
+        window.dispatchEvent(new CustomEvent('picshare_open_requests'));
+      } else if (data.type === 'group' && (data.groupId || data.target)) {
+        window.dispatchEvent(new CustomEvent('picshare_open_group', {
+          detail: { groupId: data.groupId || data.target }
+        }));
+      } else if (data.type === 'friend' && (data.friend || data.target)) {
+        let friendObj = data.friend || data.target;
+        if (typeof friendObj === 'string') {
+          try { friendObj = JSON.parse(friendObj); } catch (e) {}
+        }
+        window.dispatchEvent(new CustomEvent('picshare_open_friend', { detail: friendObj }));
+      }
+    });
+
+    await PushNotifications.register();
+  } catch (err) {
+    console.warn('PushNotifications warning (FCM):', err.message);
+  }
+}
 
 // Создание системного канала уведомлений на Android 8.0+
 export async function ensureNotificationChannel() {
@@ -101,6 +163,7 @@ export async function requestBrowserNotificationPermission() {
   if (Capacitor.isNativePlatform()) {
     try {
       await ensureNotificationChannel();
+      initPushNotifications().catch(() => {});
       const status = await LocalNotifications.requestPermissions();
       const granted = status.display === 'granted';
       if (granted) {

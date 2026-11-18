@@ -18,7 +18,7 @@ import { GroupInfoModal } from './components/GroupInfoModal';
 import { ServerSettingsModal } from './components/ServerSettingsModal';
 import { NotificationPermissionPrompt } from './components/NotificationPermissionPrompt';
 import { UpdateModal } from './components/UpdateModal';
-import { subscribeUserToPush, initLocalNotifications } from './utils/browserNotifications';
+import { subscribeUserToPush, initLocalNotifications, initPushNotifications } from './utils/browserNotifications';
 import { checkAppUpdate } from './utils/appUpdater';
 import { App as CapApp } from '@capacitor/app';
 import { 
@@ -230,6 +230,7 @@ function MainApp() {
       loadGroups();
       loadRequestsCount();
       subscribeUserToPush().catch(() => {});
+      initPushNotifications().catch(() => {});
     } else {
       setFriends([]);
       setGroups([]);
