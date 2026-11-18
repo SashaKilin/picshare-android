@@ -1,7 +1,7 @@
 // picshare-android/src/config.js
 // Универсальная конфигурация адреса бэкенд-сервера для Android и Web
 
-const FALLBACK_SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://10.0.2.2:5000';
+const FALLBACK_SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://picshare-8h51.onrender.com';
 
 export const isCapacitorNative = () => {
   if (typeof window === 'undefined') return false;
@@ -22,19 +22,22 @@ export function getServerUrl() {
     return import.meta.env.VITE_SERVER_URL.replace(/\/+$/, '');
   }
 
-  // 3. В веб-режиме разработки на порту 5173
+  // 3. Внутри нативного приложения Android (Capacitor) сразу используем основной сервер Render
+  if (isCapacitorNative() || window.location.protocol === 'capacitor:') {
+    return FALLBACK_SERVER_URL;
+  }
+
+  // 4. В веб-режиме разработки на порту 5173
   if (window.location.port === '5173') {
     return 'http://localhost:5000';
   }
 
-  // 4. Внутри нативного приложения Android (Capacitor)
-  // На Android эмуляторе 10.0.2.2 - это localhost компьютера разработчика
-  if (isCapacitorNative() || window.location.protocol === 'capacitor:' || window.location.hostname === 'localhost') {
-    return FALLBACK_SERVER_URL;
+  // 5. В обычном браузере на проде - адрес текущего хоста или fallback
+  if (window.location.origin && window.location.origin !== 'null' && !window.location.origin.includes('localhost')) {
+    return window.location.origin;
   }
 
-  // 5. В обычном браузере на проде - адрес текущего хоста
-  return window.location.origin;
+  return FALLBACK_SERVER_URL;
 }
 
 export function setServerUrl(url) {

@@ -17,7 +17,7 @@ import { CreateGroupModal } from './components/CreateGroupModal';
 import { GroupInfoModal } from './components/GroupInfoModal';
 import { ServerSettingsModal } from './components/ServerSettingsModal';
 import { NotificationPermissionPrompt } from './components/NotificationPermissionPrompt';
-import { subscribeUserToPush } from './utils/browserNotifications';
+import { subscribeUserToPush, initLocalNotifications } from './utils/browserNotifications';
 import { App as CapApp } from '@capacitor/app';
 import { 
   Images, 
@@ -51,6 +51,11 @@ function MainApp() {
   const [profileUserId, setProfileUserId] = useState(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
+
+  // Инициализация локальных уведомлений на Android
+  useEffect(() => {
+    initLocalNotifications();
+  }, []);
 
   // Поддержка системной кнопки "Назад" на Android (Hardware Back Button)
   useEffect(() => {

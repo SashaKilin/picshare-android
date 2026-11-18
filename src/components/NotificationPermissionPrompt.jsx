@@ -12,20 +12,26 @@ export function NotificationPermissionPrompt() {
   const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
-    if (!isBrowserNotificationSupported()) return;
+    let active = true;
+    (async () => {
+      if (!isBrowserNotificationSupported()) return;
 
-    const currentPerm = getNotificationPermission();
-    setPermission(currentPerm);
+      const currentPerm = await getNotificationPermission();
+      if (!active) return;
+      setPermission(currentPerm);
 
-    // Если разрешение еще не спрашивалось ('default') и пользователь еще не закрывал окно
-    const handled = localStorage.getItem('picshare_notif_prompt_handled');
-    if (currentPerm === 'default' && !handled) {
-      // Показываем с небольшой задержкой (1.5 сек), чтобы не шокировать при загрузке страницы
-      const timer = setTimeout(() => {
-        setVisible(true);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
+      // Если разрешение еще не спрашивалось ('default') и пользователь еще не закрывал окно
+      const handled = localStorage.getItem('picshare_notif_prompt_handled');
+      if (currentPerm === 'default' && !handled) {
+        setTimeout(() => {
+          if (active) setVisible(true);
+        }, 1500);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleDismiss = () => {

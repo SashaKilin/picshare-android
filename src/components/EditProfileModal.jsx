@@ -83,7 +83,7 @@ export function EditProfileModal({ isOpen, onClose, onProfileUpdated }) {
       setSuccessMsg('');
       setShowSetPassword(false);
       setNewPassword('');
-      setBrowserPerm(getNotificationPermission());
+      getNotificationPermission().then(setBrowserPerm).catch(() => {});
 
       api.getHealth()
         .then(data => {
