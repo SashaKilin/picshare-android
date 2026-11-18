@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { api } from '../api';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 import { 
   Send, 
   Trash2, 
@@ -233,6 +235,7 @@ export function ImageChat({
 
     const handleNewImage = (newImg) => {
       const myId = Number(user.id);
+      const isInputFocused = document.activeElement === captionInputRef.current;
 
       if (isGroup) {
         if (Number(newImg.group_id) === Number(group.id)) {
@@ -242,7 +245,7 @@ export function ImageChat({
             return [...prev, newImg];
           });
 
-          if (isNearBottomRef.current || Number(newImg.sender_id) === myId) {
+          if (isNearBottomRef.current || Number(newImg.sender_id) === myId || isInputFocused) {
             scrollToBottom(true);
           } else {
             setNewUnreadCount((c) => c + 1);
@@ -261,7 +264,7 @@ export function ImageChat({
             return [...prev, newImg];
           });
 
-          if (isNearBottomRef.current || sId === myId) {
+          if (isNearBottomRef.current || sId === myId || isInputFocused) {
             scrollToBottom(true);
           } else {
             setNewUnreadCount((c) => c + 1);
@@ -374,6 +377,43 @@ export function ImageChat({
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
+  }, []);
+
+  // Автопрокрутка вниз при открытии клавиатуры на Android и мобильных экранах
+  useEffect(() => {
+    let removeKeyboardListener = null;
+
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const handleShow = () => {
+          scrollToBottom(true);
+          setTimeout(() => scrollToBottom(true), 100);
+          setTimeout(() => scrollToBottom(true), 260);
+        };
+        const willShowPromise = Keyboard.addListener('keyboardWillShow', handleShow);
+        const didShowPromise = Keyboard.addListener('keyboardDidShow', handleShow);
+        removeKeyboardListener = () => {
+          willShowPromise.then((h) => h?.remove?.()).catch(() => {});
+          didShowPromise.then((h) => h?.remove?.()).catch(() => {});
+        };
+      } catch (e) {}
+    }
+
+    const handleVisualResize = () => {
+      if (document.activeElement === captionInputRef.current) {
+        scrollToBottom(true);
+      }
+    };
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualResize);
+    }
+
+    return () => {
+      if (removeKeyboardListener) removeKeyboardListener();
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualResize);
+      }
+    };
   }, []);
 
   function handleDragOver(e) {
@@ -1068,8 +1108,15 @@ export function ImageChat({
             onChange={(e) => setCaption(e.target.value)}
             onInput={(e) => setCaption(e.target.value)}
             onCompositionEnd={(e) => setCaption(e.target.value)}
+            onFocus={() => {
+              setTimeout(() => scrollToBottom(true), 80);
+              setTimeout(() => scrollToBottom(true), 240);
+            }}
             enterKeyHint="send"
-            autoComplete="off"
+            autoComplete="on"
+            autoCorrect="on"
+            spellCheck="true"
+            inputMode="text"
             placeholder={
               replyingTo
                 ? `Ответ для @${replyingTo.sender_username}...`

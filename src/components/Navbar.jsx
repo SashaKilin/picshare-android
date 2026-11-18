@@ -30,15 +30,15 @@ export function Navbar({
         {/* Логотип */}
         <div 
           onClick={() => setActiveView('chat')} 
-          className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none group shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer select-none group shrink-0"
         >
           <img 
             src="/favicon.svg" 
             alt="PicShare" 
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 object-contain" 
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 object-contain" 
           />
           <div className="flex flex-col">
-            <div className="flex items-center gap-1.5 font-bold text-base sm:text-lg tracking-tight text-white leading-tight">
+            <div className="flex items-center gap-1 font-bold text-base sm:text-lg tracking-tight text-white leading-tight">
               <span>PicShare</span>
             </div>
             <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Обмен картинками</p>
@@ -102,10 +102,10 @@ export function Navbar({
             </button>
 
             {/* Профиль пользователя */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5 pl-1 sm:pl-2 border-l border-slate-800">
+            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-800 shrink-0">
               <button
                 onClick={() => onOpenProfile && onOpenProfile(user?.id)}
-                className="flex items-center gap-2 hover:opacity-85 transition group text-left cursor-pointer p-1 rounded-xl hover:bg-slate-800/50"
+                className="flex items-center gap-1.5 hover:opacity-85 transition group text-left cursor-pointer p-1 rounded-xl hover:bg-slate-800/50 shrink-0"
                 title="Мой профиль"
               >
                 <img
@@ -125,11 +125,11 @@ export function Navbar({
                 </div>
               </button>
 
-              {/* Настройки сервера */}
+              {/* Настройки сервера (на мобильных доступны из профиля или экрана авторизации) */}
               {onOpenServerSettings && (
                 <button
                   onClick={onOpenServerSettings}
-                  className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition"
+                  className="hidden md:flex p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition shrink-0"
                   title="Настройки сервера"
                 >
                   <Server className="w-4 h-4" />
@@ -139,8 +139,8 @@ export function Navbar({
               {/* Кнопка выхода */}
               <button
                 onClick={logout}
-                className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
-                title="Выйти"
+                className="p-1.5 sm:p-2 rounded-xl text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 transition shrink-0 flex items-center justify-center touch-manipulation active:scale-95"
+                title="Выйти из аккаунта"
               >
                 <LogOut className="w-4 h-4" />
               </button>

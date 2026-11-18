@@ -18,7 +18,8 @@ import {
   Users,
   ShieldCheck,
   Cake,
-  ExternalLink
+  ExternalLink,
+  LogOut
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -78,7 +79,7 @@ export function ProfileModal({
   onSelectFriend,
   onOpenLightbox
 }) {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, logout } = useAuth();
   const { onlineUsers } = useSocket();
 
   const [profileUser, setProfileUser] = useState(null);
@@ -269,18 +270,31 @@ export function ProfileModal({
                 </div>
 
                 {/* Кнопки действий (на мобильном на всю ширину для удобства пальца) */}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                   {isSelf ? (
-                    <button
-                      onClick={() => {
-                        onClose();
-                        onOpenEditProfile && onOpenEditProfile();
-                      }}
-                      className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                      <span>Редактировать профиль</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          onClose();
+                          onOpenEditProfile && onOpenEditProfile();
+                        }}
+                        className="flex-1 sm:flex-initial justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        <span>Редактировать профиль</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onClose();
+                          logout();
+                        }}
+                        className="flex-1 sm:flex-initial justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs sm:text-sm font-semibold transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                        title="Выйти из текущего аккаунта"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Выйти</span>
+                      </button>
+                    </>
                   ) : profileUser.relationship === 'friends' ? (
                     <button
                       onClick={() => {

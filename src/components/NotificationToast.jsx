@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
+import { Capacitor } from '@capacitor/core';
 import { Bell, Image as ImageIcon, X, ArrowRight, UserCheck } from 'lucide-react';
 
 export function NotificationToast({ onOpenRequests, onSelectFriend, onSelectGroup }) {
@@ -13,6 +14,10 @@ export function NotificationToast({ onOpenRequests, onSelectFriend, onSelectGrou
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  // На Android нативном приложении системные уведомления приходят в шторку,
+  // поэтому всплывающий внизу экрана тост не отображается
+  if (Capacitor.isNativePlatform()) return null;
 
   if (!notification) return null;
 

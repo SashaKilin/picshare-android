@@ -98,9 +98,18 @@ export function initLocalNotifications() {
 
   // Если уведомления уже разрешены в приложении, уведомляем бэкенд,
   // чтобы сервер не присылал дубли в мобильный браузер на телефоне
-  LocalNotifications.checkPermissions().then((status) => {
+  LocalNotifications.checkPermissions().then(async (status) => {
     if (status.display === 'granted') {
       api.setAppNotificationStatus(true).catch(() => {});
+      try {
+        const exactStatus = await LocalNotifications.checkExactNotificationSetting();
+        if (exactStatus && exactStatus.exact_alarm !== 'granted') {
+          console.log('⏰ Разрешение на будильники/напоминания еще не выдано, запрашиваем...');
+          await LocalNotifications.changeExactNotificationSetting();
+        }
+      } catch (alarmErr) {
+        console.warn('Exact alarm check error:', alarmErr);
+      }
     }
   }).catch(() => {});
 
@@ -169,6 +178,16 @@ export async function requestBrowserNotificationPermission() {
       if (granted) {
         api.setAppNotificationStatus(true).catch(console.warn);
         subscribeUserToPush().catch(console.warn);
+
+        // Запрос системного разрешения на "Будильники и напоминания" (exact alarms) на Android 12+
+        try {
+          const exactStatus = await LocalNotifications.checkExactNotificationSetting();
+          if (exactStatus && exactStatus.exact_alarm !== 'granted') {
+            await LocalNotifications.changeExactNotificationSetting();
+          }
+        } catch (alarmErr) {
+          console.warn('Ошибка вызова настройки точных будильников/напоминаний:', alarmErr);
+        }
       }
       return granted ? 'granted' : (status.display === 'denied' ? 'denied' : 'default');
     } catch (err) {
