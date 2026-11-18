@@ -1,0 +1,24 @@
+{
+  "appId": "com.sashakilin.picshare",
+  "appName": "PicShare",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "Keyboard": {
+      "resize": "body",
+      "style": "dark"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    }
+  }
+}
