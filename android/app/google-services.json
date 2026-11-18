@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "347256876973",
+    "project_id": "picshare-d6ca6",
+    "storage_bucket": "picshare-d6ca6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347256876973:android:6555d393ea05293ef9fb24",
+        "android_client_info": {
+          "package_name": "com.sashakilin.picshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfgFlj4ylh19FGA2Yp_D87HONsdWbuosk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
