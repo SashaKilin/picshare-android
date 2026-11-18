@@ -59,12 +59,21 @@ export async function checkAppUpdate() {
 
 export function openUpdateDownload(apkUrl) {
   if (!apkUrl) return;
-  // Открываем загрузку APK через системный браузер/Download Manager Android
   try {
-    if (typeof window !== 'undefined') {
-      window.open(apkUrl, '_system');
-    }
+    const a = document.createElement('a');
+    a.href = apkUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try { document.body.removeChild(a); } catch (e) {}
+    }, 100);
   } catch (e) {
-    window.location.href = apkUrl;
+    try {
+      window.open(apkUrl, '_system');
+    } catch (err) {
+      window.location.href = apkUrl;
+    }
   }
 }
