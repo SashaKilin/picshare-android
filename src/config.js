@@ -1,7 +1,7 @@
 // picshare-android/src/config.js
 // Универсальная конфигурация адреса бэкенд-сервера для Android и Web
 
-const FALLBACK_SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://picshare-8h51.onrender.com';
+const FALLBACK_SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://picshare-sy84.onrender.com';
 
 export const isCapacitorNative = () => {
   if (typeof window === 'undefined') return false;
@@ -13,7 +13,12 @@ export function getServerUrl() {
 
   // 1. Проверяем, задан ли адрес сервера вручную пользователем в приложении
   const custom = localStorage.getItem('picshare_server_url');
-  if (custom && custom.trim()) {
+  if (
+    custom && 
+    custom.trim() && 
+    custom !== 'https://picshare-8h51.onrender.com' && 
+    custom !== 'http://10.0.2.2:5000'
+  ) {
     return custom.trim().replace(/\/+$/, '');
   }
 

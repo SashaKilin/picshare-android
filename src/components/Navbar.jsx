@@ -32,9 +32,11 @@ export function Navbar({
           onClick={() => setActiveView('chat')} 
           className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none group shrink-0"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
-            <Images className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </div>
+          <img 
+            src="/favicon.svg" 
+            alt="PicShare" 
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 object-contain" 
+          />
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 font-bold text-base sm:text-lg tracking-tight text-white leading-tight">
               <span>PicShare</span>

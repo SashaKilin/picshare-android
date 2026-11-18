@@ -71,10 +71,10 @@ export function ServerSettingsModal({ isOpen, onClose }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <button
               type="button"
-              onClick={() => applyPreset('https://picshare-8h51.onrender.com')}
+              onClick={() => applyPreset('https://picshare-sy84.onrender.com')}
               className="px-2.5 py-1.5 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-700/60 text-indigo-200 text-left truncate transition-colors col-span-1 sm:col-span-2 font-medium"
             >
-              🌐 Основной сервер (Render) <span className="text-[10px] text-indigo-400 block font-normal">(picshare-8h51.onrender.com)</span>
+              🌐 Основной сервер (Render) <span className="text-[10px] text-indigo-400 block font-normal">(picshare-sy84.onrender.com)</span>
             </button>
             <button
               type="button"
