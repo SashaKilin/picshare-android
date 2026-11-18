@@ -21,6 +21,8 @@ import { UpdateModal } from './components/UpdateModal';
 import { subscribeUserToPush, initLocalNotifications, initPushNotifications } from './utils/browserNotifications';
 import { checkAppUpdate } from './utils/appUpdater';
 import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { 
   Images, 
   UserPlus, 
@@ -56,15 +58,23 @@ function MainApp() {
   const [updateInfo, setUpdateInfo] = useState(null);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
-  // Инициализация локальных уведомлений на Android и проверка обновлений
+  // Инициализация локальных и системных FCM push-уведомлений на Android и проверка обновлений
   useEffect(() => {
     initLocalNotifications();
+    initPushNotifications().catch(() => {});
     checkAppUpdate().then((res) => {
       if (res?.hasUpdate) {
         setUpdateInfo(res);
         setIsUpdateOpen(true);
       }
     }).catch(() => {});
+
+    // Настройка системного StatusBar на Android (отключаем наложение WebView на системную шторку)
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: '#0f172a' }).catch(() => {});
+    }
   }, []);
 
   // Поддержка системной кнопки "Назад" на Android (Hardware Back Button)
@@ -183,8 +193,12 @@ function MainApp() {
     };
 
     const handleOpenFriend = (e) => {
+      const friendData = e.detail;
+      if (!friendData) return;
+      const friendId = Number(friendData.id || friendData);
+      const targetFriend = friends.find((f) => f.id === friendId) || friendData;
       setSelectedGroup(null);
-      setSelectedFriend(e.detail);
+      setSelectedFriend(targetFriend);
       setActiveView('chat');
     };
 
@@ -222,7 +236,7 @@ function MainApp() {
         navigator.serviceWorker.removeEventListener('message', handleSwMessage);
       }
     };
-  }, [groups]);
+  }, [groups, friends]);
 
   useEffect(() => {
     if (isAuthenticated) {

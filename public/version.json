@@ -1,0 +1,7 @@
+{
+  "version": "1.0.4",
+  "versionCode": 4,
+  "releaseNotes": "• Исправлена строка ввода: мгновенная отправка без задержек клавиатуры и потери букв\n• Исправлен StatusBar: шапка чата больше не перекрывается системной шторкой\n• Исправлен клик по Push-уведомлениям: теперь пуш корректно открывает чат при нажатии",
+  "apkUrl": "https://github.com/SashaKilin/picshare-android/releases/latest/download/app-debug.apk",
+  "publishedAt": "2026-11-19"
+}

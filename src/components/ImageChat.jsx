@@ -408,7 +408,9 @@ export function ImageChat({
   // Отправка (текст, фото или текст + фото)
   async function handleSendImage(e) {
     if (e) e.preventDefault();
-    const hasText = Boolean(caption.trim());
+    const currentInputVal = captionInputRef.current ? captionInputRef.current.value : caption;
+    const textVal = (currentInputVal ?? '').trim();
+    const hasText = Boolean(textVal);
     const hasFile = Boolean(selectedFile);
 
     if ((!hasText && !hasFile) || sending) return;
@@ -426,7 +428,7 @@ export function ImageChat({
       formData.append('receiverId', friend.id);
     }
     if (hasText) {
-      formData.append('caption', caption.trim());
+      formData.append('caption', textVal);
     }
     if (replyingTo) {
       formData.append('replyToId', replyingTo.id);
@@ -436,6 +438,9 @@ export function ImageChat({
       const res = await api.sendImage(formData);
       clearSelectedFile();
       setCaption('');
+      if (captionInputRef.current) {
+        captionInputRef.current.value = '';
+      }
       setReplyingTo(null);
 
       if (res.image) {
@@ -531,8 +536,9 @@ export function ImageChat({
       )}
 
       {/* 1. Шапка чата */}
-      <div className="h-14 sm:h-16 px-3 sm:px-4 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md flex items-center justify-between shrink-0 z-20">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      <div className="safe-top border-b border-slate-800 bg-slate-900/90 backdrop-blur-md shrink-0 z-20">
+        <div className="h-14 sm:h-16 px-3 sm:px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           
           {onBack && (
             <button
@@ -654,6 +660,7 @@ export function ImageChat({
           )}
         </div>
       </div>
+    </div>
 
       {/* Ошибка */}
       {error && (
@@ -1059,6 +1066,10 @@ export function ImageChat({
             ref={captionInputRef}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
+            onInput={(e) => setCaption(e.target.value)}
+            onCompositionEnd={(e) => setCaption(e.target.value)}
+            enterKeyHint="send"
+            autoComplete="off"
             placeholder={
               replyingTo
                 ? `Ответ для @${replyingTo.sender_username}...`
@@ -1073,8 +1084,10 @@ export function ImageChat({
         {/* Кнопка отправки */}
         <button
           type="submit"
-          disabled={!hasContentToSend || sending}
-          className="p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition disabled:opacity-30 disabled:cursor-not-allowed shrink-0 touch-manipulation active:scale-95 flex items-center gap-1.5"
+          disabled={sending}
+          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition shrink-0 touch-manipulation active:scale-95 flex items-center gap-1.5 ${
+            hasContentToSend ? 'opacity-100 shadow-indigo-600/30' : 'opacity-40 cursor-pointer'
+          }`}
           title="Отправить (Enter)"
         >
           <Send className="w-4 h-4" />
