@@ -1,13 +1,33 @@
 import React, { useState } from 'react';
 import { getServerUrl, setServerUrl } from '../config';
-import { Server, Check, AlertCircle, RefreshCw, X, Radio } from 'lucide-react';
+import { CURRENT_VERSION } from '../version';
+import { checkAppUpdate } from '../utils/appUpdater';
+import { Server, Check, AlertCircle, RefreshCw, X, Radio, ArrowUpCircle } from 'lucide-react';
 
-export function ServerSettingsModal({ isOpen, onClose }) {
+export function ServerSettingsModal({ isOpen, onClose, onShowUpdate }) {
   const [url, setUrl] = useState(getServerUrl());
   const [testing, setTesting] = useState(false);
   const [status, setStatus] = useState(null); // { ok: boolean, message: string }
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateMsg, setUpdateMsg] = useState('');
 
   if (!isOpen) return null;
+
+  const handleCheckUpdate = async () => {
+    setCheckingUpdate(true);
+    setUpdateMsg('');
+    const res = await checkAppUpdate();
+    setCheckingUpdate(false);
+    if (res.hasUpdate) {
+      if (onShowUpdate) {
+        onClose();
+        onShowUpdate(res);
+      }
+    } else {
+      setUpdateMsg('У вас установлена последняя версия PicShare!');
+      setTimeout(() => setUpdateMsg(''), 4000);
+    }
+  };
 
   const handleTestConnection = async (targetUrl = url) => {
     setTesting(true);
@@ -149,6 +169,28 @@ export function ServerSettingsModal({ isOpen, onClose }) {
               Сохранить и применить
             </button>
           </div>
+        </div>
+
+        {/* Версия приложения и проверка обновлений */}
+        <div className="pt-3 border-t border-slate-800/80 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400">Версия приложения: <b className="text-slate-200">v{CURRENT_VERSION}</b></span>
+            <button
+              type="button"
+              disabled={checkingUpdate}
+              onClick={handleCheckUpdate}
+              className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition disabled:opacity-50"
+            >
+              <ArrowUpCircle className={`w-3.5 h-3.5 ${checkingUpdate ? 'animate-spin' : ''}`} />
+              <span>{checkingUpdate ? 'Проверка...' : 'Проверить обновления'}</span>
+            </button>
+          </div>
+
+          {updateMsg && (
+            <p className="text-[11px] text-emerald-400 text-center font-medium animate-fade-in">
+              {updateMsg}
+            </p>
+          )}
         </div>
 
       </div>

@@ -34,6 +34,14 @@ export function initLocalNotifications() {
 
   ensureNotificationChannel();
 
+  // Если уведомления уже разрешены в приложении, уведомляем бэкенд,
+  // чтобы сервер не присылал дубли в мобильный браузер на телефоне
+  LocalNotifications.checkPermissions().then((status) => {
+    if (status.display === 'granted') {
+      api.setAppNotificationStatus(true).catch(() => {});
+    }
+  }).catch(() => {});
+
   try {
     LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
       console.log('Клик по нативному уведомлению PicShare:', action);
@@ -96,6 +104,7 @@ export async function requestBrowserNotificationPermission() {
       const status = await LocalNotifications.requestPermissions();
       const granted = status.display === 'granted';
       if (granted) {
+        api.setAppNotificationStatus(true).catch(console.warn);
         subscribeUserToPush().catch(console.warn);
       }
       return granted ? 'granted' : (status.display === 'denied' ? 'denied' : 'default');

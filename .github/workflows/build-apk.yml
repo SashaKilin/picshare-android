@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build & Package Android APK
@@ -51,3 +54,18 @@ jobs:
           name: PicShare-Android-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
+
+      - name: Publish or Update GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "PicShare Android (Latest APK)"
+          body: |
+            🚀 Автоматическая сборка мобильного приложения PicShare для Android.
+            
+            Скачайте прикрепленный файл `app-debug.apk` на смартфон и нажмите для установки/обновления.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

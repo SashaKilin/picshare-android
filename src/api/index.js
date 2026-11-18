@@ -113,9 +113,11 @@ export const api = {
   // Health
   getHealth: () => request('/health'),
 
-  // Web Push
+  // Web Push & App Notifications
   getPushPublicKey: () => request('/push/public-key'),
-  subscribePush: (subscription) => request('/push/subscribe', { method: 'POST', body: { subscription } }),
+  subscribePush: (subscription, clientType) => request('/push/subscribe', { method: 'POST', body: { subscription, clientType } }),
   unsubscribePush: (endpoint) => request('/push/unsubscribe', { method: 'POST', body: { endpoint } }),
+  setAppNotificationStatus: (enabled) => request('/push/app-status', { method: 'POST', body: { enabled } }),
+  getPushStatus: () => request('/push/status'),
   testPush: () => request('/push/test', { method: 'POST' }),
 };

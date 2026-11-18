@@ -1,0 +1,7 @@
+{
+  "version": "1.0.2",
+  "versionCode": 2,
+  "releaseNotes": "• Новая фирменная иконка приложения в неоновом стиле\n• Прямое автоматическое подключение к боевому серверу Render\n• Отключение дубликатов уведомлений в мобильном браузере при установленном приложении\n• Встроенная проверка и автообновление с GitHub",
+  "apkUrl": "https://github.com/SashaKilin/picshare-android/releases/latest/download/app-debug.apk",
+  "publishedAt": "2026-11-18"
+}

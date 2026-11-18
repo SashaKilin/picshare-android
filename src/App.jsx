@@ -17,7 +17,9 @@ import { CreateGroupModal } from './components/CreateGroupModal';
 import { GroupInfoModal } from './components/GroupInfoModal';
 import { ServerSettingsModal } from './components/ServerSettingsModal';
 import { NotificationPermissionPrompt } from './components/NotificationPermissionPrompt';
+import { UpdateModal } from './components/UpdateModal';
 import { subscribeUserToPush, initLocalNotifications } from './utils/browserNotifications';
+import { checkAppUpdate } from './utils/appUpdater';
 import { App as CapApp } from '@capacitor/app';
 import { 
   Images, 
@@ -51,10 +53,18 @@ function MainApp() {
   const [profileUserId, setProfileUserId] = useState(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
-  // Инициализация локальных уведомлений на Android
+  // Инициализация локальных уведомлений на Android и проверка обновлений
   useEffect(() => {
     initLocalNotifications();
+    checkAppUpdate().then((res) => {
+      if (res?.hasUpdate) {
+        setUpdateInfo(res);
+        setIsUpdateOpen(true);
+      }
+    }).catch(() => {});
   }, []);
 
   // Поддержка системной кнопки "Назад" на Android (Hardware Back Button)
@@ -64,6 +74,10 @@ function MainApp() {
       CapApp.addListener('backButton', () => {
         if (lightboxImage) {
           setLightboxImage(null);
+          return;
+        }
+        if (isUpdateOpen) {
+          setIsUpdateOpen(false);
           return;
         }
         if (isEditProfileOpen) {
@@ -649,6 +663,17 @@ function MainApp() {
       <ServerSettingsModal
         isOpen={isServerSettingsOpen}
         onClose={() => setIsServerSettingsOpen(false)}
+        onShowUpdate={(info) => {
+          setUpdateInfo(info);
+          setIsUpdateOpen(true);
+        }}
+      />
+
+      {/* Окно обновления приложения */}
+      <UpdateModal
+        isOpen={isUpdateOpen}
+        onClose={() => setIsUpdateOpen(false)}
+        updateInfo={updateInfo}
       />
 
       {/* Однократный запрос на включение браузерных уведомлений */}
