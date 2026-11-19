@@ -25,7 +25,9 @@ import {
   CheckCheck,
   Clock,
   Heart,
-  Smile
+  Smile,
+  Paperclip,
+  Phone
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { StickersPicker } from './StickersPicker';
@@ -789,15 +791,13 @@ export function ImageChat({
         </div>
       )}
 
-      {/* 1. Шапка чата */}
-      <div className="safe-top border-b border-slate-800 bg-slate-900/90 backdrop-blur-md shrink-0 z-20">
-        <div className="h-14 sm:h-16 px-3 sm:px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          
+      {/* 1. Шапка чата (Telegram-стиль пузырями со скриншота 3) */}
+      <div className="safe-top px-2.5 py-2 sm:px-4 sm:py-2.5 shrink-0 z-20 flex items-center justify-between gap-2 bg-slate-950/40 backdrop-blur-md">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 md:hidden transition shrink-0"
+              className="p-2 rounded-full text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-800/80 shadow-md md:hidden transition shrink-0 active:scale-90"
               title="Назад к списку друзей"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -805,26 +805,26 @@ export function ImageChat({
           )}
 
           {isGroup ? (
-            /* Шапка для Группового чата */
+            /* Шапка для Группового чата (пузырь как в ТГ) */
             <div 
               onClick={() => onOpenGroupInfo && onOpenGroupInfo(group)}
-              className="flex items-center gap-2.5 sm:gap-3 min-w-0 cursor-pointer hover:opacity-85 transition group"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-850 border border-slate-800/80 shadow-md backdrop-blur-md cursor-pointer transition select-none group min-w-0 active:scale-[0.98]"
               title="Информация о группе и участники"
             >
               <div className="relative shrink-0">
                 <img
                   src={group?.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${group?.name}`}
                   alt={group?.name}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-indigo-500/40 object-cover bg-slate-800 shadow group-hover:border-indigo-400"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-indigo-500/40 object-cover bg-slate-800 shadow group-hover:border-indigo-400"
                 />
               </div>
 
-              <div className="min-w-0">
-                <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate">
+              <div className="min-w-0 pr-1">
+                <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate leading-tight">
                   <span className="truncate group-hover:text-indigo-300">{group?.name}</span>
                 </div>
                 {isAnyGroupTyping ? (
-                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium">
+                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium mt-0.5 leading-tight">
                     <span className="truncate">
                       {groupTypingList.map((t) => t.username).join(', ')} {groupTypingList.length > 1 ? 'печатают' : 'печатает'}
                     </span>
@@ -835,46 +835,42 @@ export function ImageChat({
                     </span>
                   </div>
                 ) : (
-                  <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                  <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5 mt-0.5 leading-tight">
                     <span className="text-indigo-400 font-medium">{group?.members_count || 1} участников</span>
-                    <span className="text-slate-600">•</span>
-                    <span>Групповой чат</span>
                   </div>
                 )}
               </div>
             </div>
           ) : isSaved ? (
-            /* Шапка для «Избранного» */
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 select-none">
+            /* Шапка для «Избранного» (пузырь как в ТГ) */
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800/80 shadow-md backdrop-blur-md select-none min-w-0">
               <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
                   <Bookmark className="w-5 h-5 fill-white/20" />
                 </div>
               </div>
 
-              <div className="min-w-0">
-                <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5 truncate">
+              <div className="min-w-0 pr-1">
+                <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5 truncate leading-tight">
                   <span className="truncate">Избранное</span>
                 </div>
-                <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
-                  <span className="text-indigo-400/90 font-medium">Ваше личное облако</span>
-                  <span className="text-slate-600">•</span>
-                  <span>Заметки и фото</span>
+                <div className="text-[11px] text-indigo-400/90 font-medium truncate mt-0.5 leading-tight">
+                  Сохранённые сообщения
                 </div>
               </div>
             </div>
           ) : (
-            /* Шапка для диалога 1-на-1 */
+            /* Шапка для диалога 1-на-1 (пузырь как в ТГ, скрин 3) */
             <div 
               onClick={() => onOpenProfile && onOpenProfile(friend?.id)}
-              className="flex items-center gap-2.5 sm:gap-3 min-w-0 cursor-pointer hover:opacity-85 transition group"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-850 border border-slate-800/80 shadow-md backdrop-blur-md cursor-pointer transition select-none group min-w-0 active:scale-[0.98]"
               title="Открыть профиль пользователя"
             >
               <div className="relative shrink-0">
                 <img
                   src={friend?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${friend?.username}`}
                   alt={friend?.username}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-700 object-cover bg-slate-800 group-hover:border-indigo-400"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-700/80 object-cover bg-slate-800 group-hover:border-indigo-400"
                 />
                 <span
                   className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-900 transition-colors ${
@@ -883,12 +879,12 @@ export function ImageChat({
                 />
               </div>
 
-              <div className="min-w-0">
-                <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate">
+              <div className="min-w-0 pr-1">
+                <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate leading-tight">
                   <span className="truncate group-hover:text-indigo-300">{friend?.username}</span>
                 </div>
                 {isFriendTyping ? (
-                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium">
+                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium mt-0.5 leading-tight">
                     <span>печатает</span>
                     <span className="inline-flex items-center gap-0.5 ml-0.5">
                       <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
@@ -897,10 +893,8 @@ export function ImageChat({
                     </span>
                   </div>
                 ) : (
-                  <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
-                    <span>{isOnline ? 'В сети' : 'Не в сети'}</span>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-indigo-400/80">Профиль и фото</span>
+                  <div className={`text-[11px] truncate mt-0.5 leading-tight ${isOnline ? 'text-emerald-400 font-medium' : 'text-slate-400'}`}>
+                    {isOnline ? 'в сети' : 'не в сети'}
                   </div>
                 )}
               </div>
@@ -908,19 +902,27 @@ export function ImageChat({
           )}
         </div>
 
-        {/* Меню действий */}
-        <div className="relative shrink-0 flex items-center gap-1">
-          {!isSaved && (
+        {/* Правый пузырь действий (телефон/профиль + 3 точки, как в ТГ на скрине 3) */}
+        {!isSaved && (
+          <div className="relative shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800/80 shadow-md backdrop-blur-md">
+            <button
+              onClick={() => isGroup ? (onOpenGroupInfo && onOpenGroupInfo(group)) : (onOpenProfile && onOpenProfile(friend?.id))}
+              className="p-1.5 rounded-full text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 transition active:scale-90"
+              title={isGroup ? 'О группе' : 'Профиль'}
+            >
+              {isGroup ? <Users className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+            </button>
+
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/80 transition active:scale-90"
+              title="Меню чата"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
-          )}
 
-          {showMenu && !isSaved && (
-            <div className="absolute right-0 top-full mt-1 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-1 z-30">
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-1 z-30 animate-scale-up">
               {isGroup ? (
                 <button
                   onClick={() => {
@@ -959,7 +961,7 @@ export function ImageChat({
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
 
       {/* Ошибка */}
@@ -1426,14 +1428,14 @@ export function ImageChat({
         </button>
       )}
 
-      {/* Превью выбранного изображения перед отправкой */}
+      {/* Превью выбранного изображения перед отправкой (плавающий пузырь как в ТГ) */}
       {previewUrl && (
-        <div className="p-2.5 sm:p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-3 shrink-0">
-          <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-indigo-500/50 shrink-0">
+        <div className="mx-2 sm:mx-3 mb-1.5 p-2 bg-slate-900/95 border border-slate-750/80 rounded-2xl flex items-center gap-3 shrink-0 shadow-xl backdrop-blur-md animate-fadeIn z-20">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-indigo-500/50 shrink-0">
             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
             <button
               onClick={clearSelectedFile}
-              className="absolute top-1 right-1 p-0.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition"
+              className="absolute top-0.5 right-0.5 p-0.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition shadow"
             >
               <X className="w-3 h-3" />
             </button>
@@ -1449,9 +1451,9 @@ export function ImageChat({
         </div>
       )}
 
-      {/* Плашка ответа на сообщение (как в Telegram) */}
+      {/* Плашка ответа на сообщение (плавающий пузырь как в Telegram) */}
       {replyingTo && (
-        <div className="px-3 sm:px-4 py-2 bg-slate-900 border-t border-indigo-500/30 flex items-center justify-between gap-3 shrink-0 animate-fadeIn">
+        <div className="mx-2 sm:mx-3 mb-1.5 px-3 py-2 bg-slate-900/95 border border-indigo-500/40 rounded-2xl flex items-center justify-between gap-3 shrink-0 shadow-xl backdrop-blur-md animate-fadeIn z-20">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-1 self-stretch bg-indigo-500 rounded-full shrink-0" />
             <Reply className="w-4 h-4 text-indigo-400 shrink-0" />
@@ -1485,9 +1487,9 @@ export function ImageChat({
         </div>
       )}
 
-      {/* 3. Панель ввода и отправки (div вместо form, чтобы избежать нативного IME закрытия при submit) */}
+      {/* 3. Панель ввода и отправки пузырями (Telegram-стиль со скриншота 4) */}
       <div 
-        className="p-2 sm:p-3 bg-slate-900/95 border-t border-slate-800 flex items-end gap-2 safe-bottom shrink-0 z-20"
+        className="p-2 sm:p-3 pb-2.5 sm:pb-3 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent flex items-end gap-2 safe-bottom shrink-0 z-20"
       >
         <input
           type="file"
@@ -1496,37 +1498,6 @@ export function ImageChat({
           accept="image/*"
           className="hidden"
         />
-
-        {/* Кнопка выбора фото/камеры */}
-        <button
-          type="button"
-          tabIndex={-1}
-          onPointerDown={(e) => {
-            // Предотвращаем потерю фокуса у textarea при клике на камеру
-            e.preventDefault();
-          }}
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 text-indigo-400 border border-slate-700/60 transition-transform shrink-0 touch-manipulation mb-0.5"
-          title="Прикрепить фото или сделать снимок"
-        >
-          <Camera className="w-5 h-5 sm:w-4 sm:h-4" />
-        </button>
-
-        {/* Кнопка открытия стикеров (Telegram стиль) */}
-        <button
-          type="button"
-          tabIndex={-1}
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={() => setIsStickersOpen((prev) => !prev)}
-          className={`p-2.5 rounded-xl border transition-all shrink-0 touch-manipulation mb-0.5 ${
-            isStickersOpen
-              ? 'bg-purple-600/30 text-purple-300 border-purple-500/50 shadow scale-105'
-              : 'bg-slate-800 hover:bg-slate-700 active:scale-90 text-purple-400 border-slate-700/60'
-          }`}
-          title="Стикеры"
-        >
-          <Smile className="w-5 h-5 sm:w-4 sm:h-4" />
-        </button>
 
         {/* Telegram-стильный пикер стикеров */}
         <StickersPicker
@@ -1539,69 +1510,105 @@ export function ImageChat({
           }}
         />
 
-        {/* Поле для ввода сообщения (textarea как в Telegram для гарантированного удержания клавиатуры на Android) */}
-        <div className="flex-1 relative flex items-center">
-          <textarea
-            ref={captionInputRef}
-            rows={1}
-            value={caption}
-            onChange={(e) => {
-              const val = e.target.value;
-              setCaption(val);
-              e.target.style.height = 'auto';
-              e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+        {/* Основной пузырь ввода сообщения: [ 😊 | Сообщение... | 📎 ] */}
+        <div className="flex-1 min-w-0 flex items-end bg-slate-900/90 border border-slate-750/80 rounded-[24px] sm:rounded-full px-1.5 py-1 shadow-lg backdrop-blur-md transition-all focus-within:border-indigo-500/60 focus-within:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
+          
+          {/* Кнопка стикеров слева внутри пузыря */}
+          <button
+            type="button"
+            tabIndex={-1}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={() => setIsStickersOpen((prev) => !prev)}
+            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation mb-0.5 ${
+              isStickersOpen
+                ? 'bg-purple-600/30 text-purple-300 scale-105'
+                : 'text-slate-400 hover:text-purple-300 hover:bg-slate-800/60 active:scale-90'
+            }`}
+            title="Стикеры"
+          >
+            <Smile className="w-5 h-5" />
+          </button>
 
-              // Отправка события "печатает..."
-              if (!isSaved && targetId) {
-                const targetPayload = isGroup ? { groupId: group?.id } : { recipientId: friend?.id };
-                if (val.trim().length > 0) {
-                  if (!isTypingActiveRef.current) {
-                    isTypingActiveRef.current = true;
-                    sendTyping(targetPayload);
-                  }
-                  if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-                  typingTimeoutRef.current = setTimeout(() => {
-                    isTypingActiveRef.current = false;
-                    stopTyping(targetPayload);
-                  }, 3000);
-                } else {
-                  if (isTypingActiveRef.current) {
-                    isTypingActiveRef.current = false;
+          {/* Бесшовное поле ввода сообщения без рамок */}
+          <div className="flex-1 min-w-0 px-2 py-0.5">
+            <textarea
+              ref={captionInputRef}
+              rows={1}
+              value={caption}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCaption(val);
+                e.target.style.height = 'auto';
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+
+                // Отправка события "печатает..."
+                if (!isSaved && targetId) {
+                  const targetPayload = isGroup ? { groupId: group?.id } : { recipientId: friend?.id };
+                  if (val.trim().length > 0) {
+                    if (!isTypingActiveRef.current) {
+                      isTypingActiveRef.current = true;
+                      sendTyping(targetPayload);
+                    }
                     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-                    stopTyping(targetPayload);
+                    typingTimeoutRef.current = setTimeout(() => {
+                      isTypingActiveRef.current = false;
+                      stopTyping(targetPayload);
+                    }, 3000);
+                  } else {
+                    if (isTypingActiveRef.current) {
+                      isTypingActiveRef.current = false;
+                      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                      stopTyping(targetPayload);
+                    }
                   }
                 }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendImage();
+                }
+              }}
+              onFocus={() => {
+                setTimeout(() => scrollToBottom(true), 80);
+                setTimeout(() => scrollToBottom(true), 240);
+              }}
+              enterKeyHint="send"
+              autoComplete="on"
+              autoCorrect="on"
+              spellCheck="true"
+              placeholder={
+                replyingTo
+                  ? `Ответ для @${replyingTo.sender_username}...`
+                  : selectedFile
+                  ? 'Добавьте подпись...'
+                  : isSaved
+                  ? 'Сохранить заметку...'
+                  : 'Сообщение'
               }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendImage();
-              }
-            }}
-            onFocus={() => {
-              setTimeout(() => scrollToBottom(true), 80);
-              setTimeout(() => scrollToBottom(true), 240);
-            }}
-            enterKeyHint="send"
-            autoComplete="on"
-            autoCorrect="on"
-            spellCheck="true"
-            placeholder={
-              replyingTo
-                ? `Ответ для @${replyingTo.sender_username}...`
-                : selectedFile
-                ? 'Добавьте подпись к фото...'
-                : isSaved
-                ? 'Сохранить заметку или фото...'
-                : 'Напишите сообщение...'
-            }
-            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200 resize-none max-h-28 overflow-y-auto no-scrollbar leading-relaxed"
-            style={{ minHeight: '42px', height: '42px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          />
+              className="w-full bg-transparent border-0 text-[15px] text-white placeholder-slate-500 focus:outline-none resize-none max-h-28 overflow-y-auto no-scrollbar leading-relaxed py-1"
+              style={{ minHeight: '26px', height: '26px', maxHeight: '110px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            />
+          </div>
+
+          {/* Кнопка скрепки справа внутри пузыря (выбор фото) */}
+          <button
+            type="button"
+            tabIndex={-1}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation mb-0.5 ${
+              selectedFile
+                ? 'text-indigo-400 bg-indigo-500/20'
+                : 'text-slate-400 hover:text-indigo-300 hover:bg-slate-800/60 active:scale-90'
+            }`}
+            title="Прикрепить фото"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Кнопка отправки */}
+        {/* Отдельный круглый пузырь справа: Кнопка Отправки (или Камера когда пусто) */}
         <button
           type="button"
           tabIndex={-1}
@@ -1611,15 +1618,24 @@ export function ImageChat({
           }}
           onClick={(e) => {
             e.preventDefault();
-            handleSendImage();
+            if (hasContentToSend) {
+              handleSendImage();
+            } else {
+              fileInputRef.current?.click();
+            }
           }}
-          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition-all duration-200 shrink-0 touch-manipulation active:scale-90 flex items-center gap-1.5 mb-0.5 ${
-            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95'
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg touch-manipulation transition-all duration-200 active:scale-90 mb-0.5 ${
+            hasContentToSend
+              ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 hover:from-indigo-500 text-white shadow-indigo-600/40 scale-100'
+              : 'bg-slate-900/90 hover:bg-slate-800 text-indigo-400 border border-slate-750/80 shadow-md hover:text-white'
           } ${sending ? 'animate-send-pop' : ''}`}
-          title="Отправить (Enter)"
+          title={hasContentToSend ? 'Отправить (Enter)' : 'Сделать фото / выбрать из галереи'}
         >
-          <Send className={`w-4 h-4 transition-transform duration-200 ${hasContentToSend ? 'translate-x-0' : ''}`} />
-          <span className="hidden sm:inline text-xs">Отправить</span>
+          {hasContentToSend ? (
+            <Send className="w-5 h-5 translate-x-0.5" />
+          ) : (
+            <Camera className="w-5 h-5" />
+          )}
         </button>
       </div>
 
