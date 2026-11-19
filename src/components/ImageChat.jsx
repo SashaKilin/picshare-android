@@ -22,7 +22,9 @@ import {
   Users,
   Bookmark,
   Check,
-  CheckCheck
+  CheckCheck,
+  Clock,
+  Heart
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -174,6 +176,11 @@ export function ImageChat({
   const [replyingTo, setReplyingTo] = useState(null);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
 
+  // Анимации удаления и двойного тапа
+  const [deletingIds, setDeletingIds] = useState(new Set());
+  const [heartBurstId, setHeartBurstId] = useState(null);
+  const lastTapRef = useRef({ time: 0, id: null });
+
   const fileInputRef = useRef(null);
   const captionInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -284,7 +291,7 @@ export function ImageChat({
     };
 
     const handleDeletedImage = ({ imageId }) => {
-      setImages((prev) => prev.filter((img) => img.id !== imageId));
+      triggerDeleteAnimation(imageId);
     };
 
     const handleMessagesRead = ({ readerId }) => {
@@ -466,22 +473,102 @@ export function ImageChat({
     }
   }
 
-  // Отправка (текст, фото или текст + фото)
+  // Плавное удаление сообщения с анимацией схлопывания
+  function triggerDeleteAnimation(imageId, onFinish) {
+    setDeletingIds((prev) => new Set(prev).add(imageId));
+    setTimeout(() => {
+      setImages((prev) => prev.filter((img) => img.id !== imageId));
+      setDeletingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(imageId);
+        return next;
+      });
+      if (onFinish) onFinish();
+    }, 320);
+  }
+
+  // Двойной тап по сообщению для быстрой реакции (сердечко с анимацией всплеска)
+  function handleMessageTap(msgId) {
+    const now = Date.now();
+    if (lastTapRef.current.id === msgId && now - lastTapRef.current.time < 350) {
+      setHeartBurstId(msgId);
+      handleAddReaction(msgId, '❤️');
+      if (navigator.vibrate) {
+        try { navigator.vibrate(20); } catch (e) {}
+      }
+      setTimeout(() => setHeartBurstId((curr) => curr === msgId ? null : curr), 650);
+      lastTapRef.current = { time: 0, id: null };
+    } else {
+      lastTapRef.current = { time: now, id: msgId };
+    }
+  }
+
+  // Отправка (текст, фото или текст + фото) с мгновенным оптимистичным отображением (0мс задержки)
   async function handleSendImage(e) {
-    if (e) e.preventDefault();
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
     const currentInputVal = captionInputRef.current ? captionInputRef.current.value : caption;
     const textVal = (currentInputVal ?? '').trim();
     const hasText = Boolean(textVal);
     const hasFile = Boolean(selectedFile);
 
-    if ((!hasText && !hasFile) || sending) return;
+    if (!hasText && !hasFile) return;
 
-    setSending(true);
-    setError('');
+    // Сохраняем значения для асинхронной отправки
+    const fileToSend = selectedFile;
+    const previewToSend = previewUrl;
+    const replyToSend = replyingTo;
+    const tempId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
 
+    // 1. МГНОВЕННО очищаем поле ввода и ответ, чтобы пользователь мог сразу печатать дальше!
+    setCaption('');
+    if (captionInputRef.current) {
+      captionInputRef.current.value = '';
+    }
+    setReplyingTo(null);
+    clearSelectedFile();
+
+    // 2. Удерживаем клавиатуру открытой на Android!
+    captionInputRef.current?.focus();
+    Keyboard?.show?.().catch?.(() => {});
+
+    // 3. Создаём оптимистичное сообщение со статусом отправки (часики как в Telegram)
+    const optimisticMessage = {
+      id: tempId,
+      temp_id: tempId,
+      sender_id: user.id,
+      receiver_id: isGroup ? null : friend?.id,
+      group_id: isGroup ? group?.id : null,
+      file_url: previewToSend || '',
+      original_name: fileToSend ? fileToSend.name : '',
+      caption: textVal,
+      reply_to: replyToSend ? {
+        id: replyToSend.id,
+        sender_username: replyToSend.sender_username,
+        caption: replyToSend.caption,
+        file_url: replyToSend.file_url
+      } : null,
+      reply_to_id: replyToSend ? replyToSend.id : null,
+      created_at: new Date().toISOString(),
+      sender_username: user.username,
+      sender_avatar: user.avatar,
+      is_pending: true, // Показывает часики!
+      is_read: false
+    };
+
+    // 4. Мгновенно отображаем в чате и скроллим вниз
+    setImages((prev) => [...prev, optimisticMessage]);
+    scrollToBottom(true);
+
+    if (hasFile) {
+      confetti({ particleCount: 25, spread: 40, origin: { y: 0.85 } });
+    }
+
+    // 5. Формируем запрос на сервер
     const formData = new FormData();
     if (hasFile) {
-      formData.append('image', selectedFile);
+      formData.append('image', fileToSend);
     }
     if (isGroup) {
       formData.append('groupId', group.id);
@@ -491,34 +578,38 @@ export function ImageChat({
     if (hasText) {
       formData.append('caption', textVal);
     }
-    if (replyingTo) {
-      formData.append('replyToId', replyingTo.id);
+    if (replyToSend) {
+      formData.append('replyToId', replyToSend.id);
     }
 
     try {
+      setSending(true);
+      setError('');
       const res = await api.sendImage(formData);
-      clearSelectedFile();
-      setCaption('');
-      if (captionInputRef.current) {
-        captionInputRef.current.value = '';
-      }
-      setReplyingTo(null);
-
       if (res.image) {
+        latestImageIdRef.current = Math.max(latestImageIdRef.current, res.image.id);
         setImages((prev) => {
-          if (prev.some((img) => img.id === res.image.id)) return prev;
-          latestImageIdRef.current = Math.max(latestImageIdRef.current, res.image.id);
-          return [...prev, res.image];
+          const alreadyExists = prev.some((img) => img.id === res.image.id);
+          if (alreadyExists) {
+            return prev.filter((img) => img.id !== tempId);
+          }
+          return prev.map((img) =>
+            img.id === tempId ? { ...res.image, is_pending: false } : img
+          );
         });
-      }
-      scrollToBottom(true);
-      if (hasFile) {
-        confetti({ particleCount: 25, spread: 40, origin: { y: 0.85 } });
       }
     } catch (err) {
       setError(err.message || 'Не удалось отправить сообщение');
+      // Помечаем оптимистичное сообщение как ошибку отправки
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === tempId ? { ...img, is_pending: false, is_failed: true } : img
+        )
+      );
     } finally {
       setSending(false);
+      captionInputRef.current?.focus();
+      Keyboard?.show?.().catch?.(() => {});
     }
   }
 
@@ -550,12 +641,13 @@ export function ImageChat({
 
   async function handleDeleteImage(imageId) {
     if (!confirm('Удалить это сообщение?')) return;
-    try {
-      await api.deleteImage(imageId);
-      setImages((prev) => prev.filter((img) => img.id !== imageId));
-    } catch (err) {
-      alert(err.message || 'Ошибка удаления');
-    }
+    triggerDeleteAnimation(imageId, async () => {
+      try {
+        await api.deleteImage(imageId);
+      } catch (err) {
+        alert(err.message || 'Ошибка удаления');
+      }
+    });
   }
 
   async function handleRemoveFriend() {
@@ -821,7 +913,13 @@ export function ImageChat({
 
               <div 
                 id={`msg-${img.id}`}
-                className={`flex flex-col ${isMe ? 'items-end animate-msg-me' : 'items-start animate-msg-other'} group w-full`}
+                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} ${
+                  deletingIds.has(img.id)
+                    ? 'animate-msg-delete'
+                    : isMe
+                    ? 'animate-msg-me'
+                    : 'animate-msg-other'
+                } group w-full`}
               >
                 
                 <div 
@@ -841,11 +939,17 @@ export function ImageChat({
                   </span>
                   <span className="text-[10px] text-slate-500 flex items-center gap-1 select-none">
                     <span>{new Date(img.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    {isMe && !isGroup && (
-                      Boolean(img.is_read) ? (
-                        <CheckCheck className="w-3.5 h-3.5 text-sky-400 shrink-0" title="Прочитано" />
-                      ) : (
-                        <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" title="Доставлено" />
+                    {isMe && (
+                      img.is_pending ? (
+                        <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0 animate-spin-slow" title="Отправляется..." />
+                      ) : img.is_failed ? (
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" title="Не удалось отправить" />
+                      ) : !isGroup && (
+                        Boolean(img.is_read) ? (
+                          <CheckCheck className="w-3.5 h-3.5 text-sky-400 shrink-0" title="Прочитано" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" title="Доставлено" />
+                        )
                       )
                     )}
                   </span>
@@ -854,9 +958,20 @@ export function ImageChat({
                 <SwipeableMessage onReply={() => handleStartReply(img)} isMe={isMe}>
                   {/* ВАРИАНТ 1: Карточка с изображением (+ опциональная подпись) */}
                   {hasImage ? (
-                    <div className={`relative w-full max-w-[85%] sm:max-w-md rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-xl transition-all ${
-                      highlightedMessageId === img.id ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-indigo-500/50 shadow-lg scale-[1.01]' : ''
-                    }`}>
+                    <div 
+                      onClick={() => handleMessageTap(img.id)}
+                      className={`relative w-full max-w-[85%] sm:max-w-md rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-xl transition-all active:scale-[0.985] touch-manipulation ${
+                        highlightedMessageId === img.id ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-indigo-500/50 shadow-lg scale-[1.01]' : ''
+                      }`}
+                    >
+                      {/* Анимация всплеска сердечка при двойном тапе */}
+                      {heartBurstId === img.id && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                          <span className="text-5xl animate-heart-burst drop-shadow-xl select-none">
+                            ❤️
+                          </span>
+                        </div>
+                      )}
                       
                       {/* Цитата ответа на предыдущее сообщение (если есть) */}
                       {img.reply_to && (
@@ -971,13 +1086,24 @@ export function ImageChat({
                     </div>
                   ) : (
                     /* ВАРИАНТ 2: Обычное текстовое сообщение */
-                    <div className={`relative max-w-[85%] sm:max-w-md p-3 sm:p-3.5 rounded-2xl shadow-md transition-all ${
-                      highlightedMessageId === img.id ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-indigo-500/50 shadow-lg scale-[1.01]' : ''
-                    } ${
-                      isMe
-                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-tr-xs'
-                        : 'bg-slate-800 text-slate-100 rounded-tl-xs border border-slate-700/60'
-                    }`}>
+                    <div 
+                      onClick={() => handleMessageTap(img.id)}
+                      className={`relative max-w-[85%] sm:max-w-md p-3 sm:p-3.5 rounded-2xl shadow-md transition-all active:scale-[0.985] touch-manipulation ${
+                        highlightedMessageId === img.id ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-950 shadow-indigo-500/50 shadow-lg scale-[1.01]' : ''
+                      } ${
+                        isMe
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-tr-xs'
+                          : 'bg-slate-800 text-slate-100 rounded-tl-xs border border-slate-700/60'
+                      }`}
+                    >
+                      {/* Анимация всплеска сердечка при двойном тапе */}
+                      {heartBurstId === img.id && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                          <span className="text-4xl animate-heart-burst drop-shadow-xl select-none">
+                            ❤️
+                          </span>
+                        </div>
+                      )}
                       
                       {/* Цитата ответа на предыдущее сообщение (если есть) */}
                       {img.reply_to && (
@@ -1074,7 +1200,7 @@ export function ImageChat({
       {showScrollBottom && (
         <button
           onClick={() => scrollToBottom(true)}
-          className="absolute bottom-16 sm:bottom-20 right-4 sm:right-6 z-30 flex items-center gap-2 px-3.5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xl shadow-indigo-950/80 transition transform hover:scale-105 active:scale-95 animate-bounce-short border border-indigo-400/30"
+          className="absolute bottom-16 sm:bottom-20 right-4 sm:right-6 z-30 flex items-center gap-2 px-3.5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xl shadow-indigo-950/80 transition transform hover:scale-105 active:scale-95 animate-pop-scale border border-indigo-400/30 touch-manipulation"
         >
           <ArrowDown className="w-3.5 h-3.5" />
           <span>{newUnreadCount > 0 ? `Новые (+${newUnreadCount})` : 'Вниз'}</span>
@@ -1142,7 +1268,10 @@ export function ImageChat({
 
       {/* 3. Панель ввода и отправки */}
       <form 
-        onSubmit={handleSendImage}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSendImage(e);
+        }}
         className="p-2 sm:p-3 bg-slate-900/95 border-t border-slate-800 flex items-center gap-2 safe-bottom shrink-0 z-20"
       >
         <input
@@ -1157,7 +1286,7 @@ export function ImageChat({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-400 border border-slate-700/60 transition shrink-0 touch-manipulation"
+          className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 text-indigo-400 border border-slate-700/60 transition-transform shrink-0 touch-manipulation"
           title="Прикрепить фото или сделать снимок"
         >
           <Camera className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -1172,6 +1301,12 @@ export function ImageChat({
             onChange={(e) => setCaption(e.target.value)}
             onInput={(e) => setCaption(e.target.value)}
             onCompositionEnd={(e) => setCaption(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendImage(e);
+              }
+            }}
             onFocus={() => {
               setTimeout(() => scrollToBottom(true), 80);
               setTimeout(() => scrollToBottom(true), 240);
@@ -1190,21 +1325,33 @@ export function ImageChat({
                 ? 'Сохранить заметку или фото...'
                 : 'Напишите сообщение...'
             }
-            className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200"
           />
         </div>
 
         {/* Кнопка отправки */}
         <button
-          type="submit"
-          disabled={sending}
+          type="button"
+          onMouseDown={(e) => {
+            // Предотвращаем потерю фокуса при клике мышью на десктопе
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            // КРИТИЧНО ДЛЯ ANDROID: нажатие на кнопку не забирает фокус у input, благодаря чему виртуальная клавиатура НЕ закрывается!
+            e.preventDefault();
+            handleSendImage(e);
+          }}
+          onClick={(e) => {
+            handleSendImage(e);
+          }}
+          disabled={!hasContentToSend}
           className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition-all duration-200 shrink-0 touch-manipulation active:scale-90 flex items-center gap-1.5 ${
-            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95 cursor-pointer'
+            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95 cursor-not-allowed'
           } ${sending ? 'animate-send-pop' : ''}`}
           title="Отправить (Enter)"
         >
-          <Send className={`w-4 h-4 transition-transform duration-200 ${sending ? '-translate-y-0.5 translate-x-0.5' : ''}`} />
-          <span className="hidden sm:inline text-xs">{sending ? 'Отправка...' : 'Отправить'}</span>
+          <Send className={`w-4 h-4 transition-transform duration-200 ${hasContentToSend ? 'translate-x-0' : ''}`} />
+          <span className="hidden sm:inline text-xs">Отправить</span>
         </button>
       </form>
 

@@ -226,3 +226,67 @@ html, body, #root {
 .animate-tab-slide {
   animation: tabSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes msgDelete {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-height: 600px;
+  }
+  40% {
+    opacity: 0.3;
+    transform: scale(0.92) translateX(12px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-10px);
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.animate-msg-delete {
+  animation: msgDelete 0.32s cubic-bezier(0.2, 0, 0, 1) forwards !important;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 2.5s linear infinite;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.4) rotate(0deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.9) translateY(-30px);
+    opacity: 0;
+  }
+}
+
+.animate-heart-burst {
+  animation: heartBurst 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  pointer-events: none;
+}
