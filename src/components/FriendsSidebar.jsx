@@ -49,7 +49,7 @@ export function FriendsSidebar({
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'groups'
   const [filter, setFilter] = useState('');
-  const { onlineUsers, unreadMap } = useSocket();
+  const { onlineUsers, unreadMap, typingUsers } = useSocket();
 
   // Состояние закреплённых диалогов (сохраняется в localStorage)
   const [pinnedChats, setPinnedChats] = useState(() => {
@@ -359,7 +359,16 @@ export function FriendsSidebar({
 
                   <div className="flex items-center justify-between gap-1 mt-0.5">
                     <div className="text-xs text-slate-400 truncate flex-1 flex items-center gap-1 min-w-0">
-                      {friend.last_caption || friend.last_file_url ? (
+                      {typingUsers && typingUsers[`direct_${friend.id}`] ? (
+                        <span className="text-indigo-400 font-medium flex items-center gap-1">
+                          <span>печатает</span>
+                          <span className="inline-flex items-center gap-0.5">
+                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
+                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
+                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                          </span>
+                        </span>
+                      ) : friend.last_caption || friend.last_file_url ? (
                         <>
                           {isLastMsgFromMe && (
                             <span className="flex items-center gap-0.5 text-slate-400 shrink-0 font-medium text-[11px]">
@@ -492,7 +501,18 @@ export function FriendsSidebar({
                   </div>
 
                   <div className="text-xs text-slate-400 truncate mt-0.5 flex items-center gap-1.5 min-w-0">
-                    {grp.last_caption || grp.last_file_url ? (
+                    {Object.values(typingUsers || {}).some(
+                      (t) => Number(t.groupId) === Number(grp.id) && Number(t.userId) !== Number(user?.id)
+                    ) ? (
+                      <span className="text-indigo-400 font-medium flex items-center gap-1">
+                        <span>печатает</span>
+                        <span className="inline-flex items-center gap-0.5">
+                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
+                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
+                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                        </span>
+                      </span>
+                    ) : grp.last_caption || grp.last_file_url ? (
                       <div className="flex items-center gap-1 min-w-0 truncate">
                         {Number(grp.last_sender_id) === Number(user?.id) ? (
                           <span className="text-indigo-400 font-medium text-[11px] shrink-0">Вы:</span>

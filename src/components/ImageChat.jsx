@@ -149,7 +149,7 @@ export function ImageChat({
   onOpenGroupInfo,
 }) {
   const { user } = useAuth();
-  const { socket, onlineUsers, markAsRead, setActiveFriendId, setActiveGroupId } = useSocket();
+  const { socket, onlineUsers, markAsRead, setActiveFriendId, setActiveGroupId, typingUsers, sendTyping, stopTyping } = useSocket();
 
   const isGroup = Boolean(group);
   const targetId = isGroup ? group.id : friend?.id;
@@ -181,12 +181,46 @@ export function ImageChat({
   const [heartBurstId, setHeartBurstId] = useState(null);
   const lastTapRef = useRef({ time: 0, id: null });
 
+  // Индикатор набора текста ("Печатает...")
+  const typingTimeoutRef = useRef(null);
+  const isTypingActiveRef = useRef(false);
+
+  const isFriendTyping = !isGroup && !isSaved && Boolean(typingUsers && typingUsers[`direct_${friend?.id}`]);
+  const groupTypingList = isGroup
+    ? Object.values(typingUsers || {}).filter(
+        (t) => Number(t.groupId) === Number(group?.id) && Number(t.userId) !== Number(user?.id)
+      )
+    : [];
+  const isAnyGroupTyping = groupTypingList.length > 0;
+
   const fileInputRef = useRef(null);
   const captionInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const latestImageIdRef = useRef(0);
   const isNearBottomRef = useRef(true);
+
+  // Сброс индикатора печати при уходе из чата
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (isTypingActiveRef.current) {
+        isTypingActiveRef.current = false;
+        if (!isSaved && targetId) {
+          stopTyping(isGroup ? { groupId: group?.id } : { recipientId: friend?.id });
+        }
+      }
+    };
+  }, [targetId, isGroup]);
+
+  // Автопрокрутка при появлении индикатора набора текста, если пользователь внизу
+  useEffect(() => {
+    if (isFriendTyping || isAnyGroupTyping) {
+      if (!showScrollBottom) {
+        scrollToBottom(false);
+      }
+    }
+  }, [isFriendTyping, isAnyGroupTyping]);
 
   useEffect(() => {
     if (isGroup && group?.id) {
@@ -530,6 +564,15 @@ export function ImageChat({
     setReplyingTo(null);
     clearSelectedFile();
 
+    // Снимаем статус "печатает..." при отправке сообщения
+    if (isTypingActiveRef.current) {
+      isTypingActiveRef.current = false;
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (!isSaved && targetId) {
+        stopTyping(isGroup ? { groupId: group?.id } : { recipientId: friend?.id });
+      }
+    }
+
     // 2. Удерживаем клавиатуру открытой на Android!
     captionInputRef.current?.focus();
 
@@ -721,11 +764,24 @@ export function ImageChat({
                 <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate">
                   <span className="truncate group-hover:text-indigo-300">{group?.name}</span>
                 </div>
-                <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
-                  <span className="text-indigo-400 font-medium">{group?.members_count || 1} участников</span>
-                  <span className="text-slate-600">•</span>
-                  <span>Групповой чат</span>
-                </div>
+                {isAnyGroupTyping ? (
+                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium">
+                    <span className="truncate">
+                      {groupTypingList.map((t) => t.username).join(', ')} {groupTypingList.length > 1 ? 'печатают' : 'печатает'}
+                    </span>
+                    <span className="inline-flex items-center gap-0.5 ml-0.5 shrink-0">
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                    <span className="text-indigo-400 font-medium">{group?.members_count || 1} участников</span>
+                    <span className="text-slate-600">•</span>
+                    <span>Групповой чат</span>
+                  </div>
+                )}
               </div>
             </div>
           ) : isSaved ? (
@@ -772,11 +828,22 @@ export function ImageChat({
                 <div className="font-bold text-sm text-slate-100 flex items-center gap-2 truncate">
                   <span className="truncate group-hover:text-indigo-300">{friend?.username}</span>
                 </div>
-                <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
-                  <span>{isOnline ? 'В сети' : 'Не в сети'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-indigo-400/80">Профиль и фото</span>
-                </div>
+                {isFriendTyping ? (
+                  <div className="text-[11px] text-indigo-400 truncate flex items-center gap-1 font-medium">
+                    <span>печатает</span>
+                    <span className="inline-flex items-center gap-0.5 ml-0.5">
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
+                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                    <span>{isOnline ? 'В сети' : 'Не в сети'}</span>
+                    <span className="text-slate-600">•</span>
+                    <span className="text-indigo-400/80">Профиль и фото</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1192,6 +1259,23 @@ export function ImageChat({
           );
         })}
 
+        {/* Анимированный бабл "печатает..." внизу ленты сообщений (как в Telegram) */}
+        {(isFriendTyping || isAnyGroupTyping) && (
+          <div className="flex items-center gap-2 mb-2 mt-1 px-1 animate-msg-appear">
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl rounded-bl-sm bg-slate-800/90 border border-slate-700/60 shadow-lg shadow-black/20 backdrop-blur-sm">
+              <span className="text-xs text-indigo-300 font-medium">
+                {isGroup ? groupTypingList.map((t) => t.username).join(', ') : friend?.username}
+              </span>
+              <span className="text-[11px] text-slate-400">печатает</span>
+              <div className="flex items-center gap-1 pl-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-typing-dot-1" />
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-typing-dot-2" />
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-typing-dot-3" />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -1299,9 +1383,32 @@ export function ImageChat({
             rows={1}
             value={caption}
             onChange={(e) => {
-              setCaption(e.target.value);
+              const val = e.target.value;
+              setCaption(val);
               e.target.style.height = 'auto';
               e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+
+              // Отправка события "печатает..."
+              if (!isSaved && targetId) {
+                const targetPayload = isGroup ? { groupId: group?.id } : { recipientId: friend?.id };
+                if (val.trim().length > 0) {
+                  if (!isTypingActiveRef.current) {
+                    isTypingActiveRef.current = true;
+                    sendTyping(targetPayload);
+                  }
+                  if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                  typingTimeoutRef.current = setTimeout(() => {
+                    isTypingActiveRef.current = false;
+                    stopTyping(targetPayload);
+                  }, 3000);
+                } else {
+                  if (isTypingActiveRef.current) {
+                    isTypingActiveRef.current = false;
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                    stopTyping(targetPayload);
+                  }
+                }
+              }
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -1326,8 +1433,8 @@ export function ImageChat({
                 ? 'Сохранить заметку или фото...'
                 : 'Напишите сообщение...'
             }
-            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200 resize-none max-h-28 overflow-y-auto custom-scrollbar leading-relaxed"
-            style={{ minHeight: '42px', height: '42px', maxHeight: '120px' }}
+            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200 resize-none max-h-28 overflow-y-auto no-scrollbar leading-relaxed"
+            style={{ minHeight: '42px', height: '42px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           />
         </div>
 
