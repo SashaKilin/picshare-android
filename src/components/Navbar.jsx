@@ -8,7 +8,8 @@ import {
   LogIn, 
   LayoutGrid, 
   MessageSquareHeart,
-  Server
+  Server,
+  Smile
 } from 'lucide-react';
 
 export function Navbar({ 
@@ -17,6 +18,7 @@ export function Navbar({
   onOpenRequests, 
   onOpenProfile,
   onOpenServerSettings,
+  onOpenStickers,
   requestsCount = 0,
   activeView, 
   setActiveView 
@@ -85,6 +87,16 @@ export function Navbar({
             >
               <UserPlus className="w-4 h-4 text-indigo-400" />
               <span className="hidden lg:inline ml-1.5">Найти друзей</span>
+            </button>
+
+            {/* Стикеры и магазин стикерпаков */}
+            <button
+              onClick={onOpenStickers}
+              className="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 text-xs sm:text-sm font-medium border border-purple-500/20 transition active:scale-95"
+              title="Стикеры и Магазин стикерпаков"
+            >
+              <Smile className="w-4 h-4 text-purple-400" />
+              <span className="hidden lg:inline ml-1.5">Стикеры</span>
             </button>
 
             {/* Заявки в друзья */}

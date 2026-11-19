@@ -24,9 +24,11 @@ import {
   Check,
   CheckCheck,
   Clock,
-  Heart
+  Heart,
+  Smile
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { StickersPicker } from './StickersPicker';
 
 // Вспомогательная функция для группировки по датам
 function formatMessageDate(dateStr) {
@@ -147,6 +149,7 @@ export function ImageChat({
   onBack,
   onOpenProfile,
   onOpenGroupInfo,
+  onOpenStickerStore,
 }) {
   const { user } = useAuth();
   const { socket, onlineUsers, markAsRead, setActiveFriendId, setActiveGroupId, typingUsers, sendTyping, stopTyping } = useSocket();
@@ -159,6 +162,7 @@ export function ImageChat({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [isStickersOpen, setIsStickersOpen] = useState(false);
 
   // Состояние загрузки новой картинки
   const [selectedFile, setSelectedFile] = useState(null);
@@ -655,6 +659,61 @@ export function ImageChat({
     }
   }
 
+  // Мгновенная отправка стикера (как в Telegram)
+  async function handleSendSticker(sticker) {
+    if (!sticker || !sticker.file_url) return;
+    const tempId = 'temp_stk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    const replyToSend = replyingTo;
+    setReplyingTo(null);
+
+    const optimisticSticker = {
+      id: tempId,
+      temp_id: tempId,
+      sender_id: user.id,
+      receiver_id: isGroup ? null : friend?.id,
+      group_id: isGroup ? group?.id : null,
+      file_url: sticker.file_url,
+      original_name: 'sticker.webp',
+      caption: '',
+      reply_to: replyToSend ? {
+        id: replyToSend.id,
+        sender_username: replyToSend.sender_username,
+        caption: replyToSend.caption,
+        file_url: replyToSend.file_url
+      } : null,
+      reply_to_id: replyToSend ? replyToSend.id : null,
+      created_at: new Date().toISOString(),
+      sender_username: user.username,
+      sender_avatar: user.avatar,
+      is_pending: true,
+      is_sticker: true,
+      is_read: false
+    };
+
+    setImages((prev) => [...prev, optimisticSticker]);
+    scrollToBottom(true);
+
+    try {
+      const payload = {
+        fileUrl: sticker.file_url,
+        isSticker: true,
+        receiverId: isGroup ? undefined : friend?.id,
+        groupId: isGroup ? group?.id : undefined,
+        replyToId: replyToSend ? replyToSend.id : undefined
+      };
+      const res = await api.sendSticker(payload);
+      if (res.image) {
+        setImages((prev) =>
+          prev.map((img) => (img.id === tempId ? { ...res.image, is_pending: false, is_sticker: true } : img))
+        );
+      }
+    } catch (err) {
+      console.error('Ошибка отправки стикера:', err);
+      setError('Не удалось отправить стикер');
+      setImages((prev) => prev.filter((img) => img.id !== tempId));
+    }
+  }
+
   function handleStartReply(img) {
     const senderName = img.sender_username || (Number(img.sender_id) === Number(user.id) ? user.username : (isGroup ? 'Участник' : friend?.username));
     setReplyingTo({
@@ -959,7 +1018,8 @@ export function ImageChat({
         {/* Сообщения (текстовые и с картинками) */}
         {images.map((img, index) => {
           const isMe = Number(img.sender_id) === Number(user.id);
-          const hasImage = Boolean(img.file_url && img.file_url.trim());
+          const isSticker = Boolean(img.is_sticker);
+          const hasImage = Boolean(img.file_url && img.file_url.trim()) && !isSticker;
           const currentDate = formatMessageDate(img.created_at);
           const prevDate = index > 0 ? formatMessageDate(images[index - 1].created_at) : null;
           const showDateDivider = currentDate !== prevDate;
@@ -1022,8 +1082,84 @@ export function ImageChat({
                 </div>
 
                 <SwipeableMessage onReply={() => handleStartReply(img)} isMe={isMe}>
-                  {/* ВАРИАНТ 1: Карточка с изображением (+ опциональная подпись) */}
-                  {hasImage ? (
+                  {isSticker ? (
+                    /* ВАРИАНТ 0: Стикер (как в Telegram — чистый прозрачный, без рамок) */
+                    <div 
+                      onClick={() => handleMessageTap(img.id)}
+                      className={`relative group/stk select-none my-1 transition-transform active:scale-95 touch-manipulation ${
+                        highlightedMessageId === img.id ? 'ring-2 ring-indigo-400 rounded-2xl p-1 shadow-lg' : ''
+                      }`}
+                    >
+                      {heartBurstId === img.id && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                          <span className="text-5xl animate-heart-burst drop-shadow-xl select-none">
+                            ❤️
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Цитата ответа (если есть) */}
+                      {img.reply_to && (
+                        <div 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            scrollToMessage(img.reply_to.id);
+                          }}
+                          className="mb-1.5 p-1.5 rounded-xl bg-slate-900/80 border-l-3 border-indigo-400 flex items-center gap-2 cursor-pointer transition select-none group/quote max-w-[200px]"
+                        >
+                          <div className="min-w-0 flex-1 text-left">
+                            <div className="text-[10px] font-bold text-indigo-300 truncate">
+                              {img.reply_to.username || 'Пользователь'}
+                            </div>
+                            <div className="text-[9px] text-slate-300 truncate">
+                              {img.reply_to.caption || (img.reply_to.file_url ? '📷 Стикер/фото' : 'Сообщение')}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="relative">
+                        <img
+                          src={img.file_url}
+                          alt="Стикер"
+                          className="w-32 h-32 sm:w-40 sm:h-40 object-contain filter drop-shadow-md hover:scale-105 transition-transform duration-150 cursor-pointer"
+                          loading="lazy"
+                          onClick={() => onOpenLightbox(img)}
+                        />
+
+                        {activeReaction && (
+                          <span className="absolute -bottom-2 -right-2 text-base bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full shadow-lg animate-reaction-pop">
+                            {activeReaction}
+                          </span>
+                        )}
+
+                        <div className="absolute top-0 right-0 opacity-0 group-hover/stk:opacity-100 transition-opacity flex items-center gap-1 bg-slate-900/80 backdrop-blur-sm rounded-lg p-1 border border-slate-700/60 shadow">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleAddReaction(img.id, '❤️'); }}
+                            className="text-xs hover:scale-125 transition"
+                          >
+                            ❤️
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleStartReply(img); }}
+                            className="text-slate-400 hover:text-white p-0.5"
+                            title="Ответить"
+                          >
+                            <Reply className="w-3 h-3" />
+                          </button>
+                          {isMe && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDeleteImage(img.id); }}
+                              className="text-slate-400 hover:text-rose-400 p-0.5"
+                              title="Удалить"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : hasImage ? (
                     <div 
                       onClick={() => handleMessageTap(img.id)}
                       className={`relative w-full max-w-[85%] sm:max-w-md rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-xl transition-all active:scale-[0.985] touch-manipulation ${
@@ -1375,6 +1511,33 @@ export function ImageChat({
         >
           <Camera className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
+
+        {/* Кнопка открытия стикеров (Telegram стиль) */}
+        <button
+          type="button"
+          tabIndex={-1}
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={() => setIsStickersOpen((prev) => !prev)}
+          className={`p-2.5 rounded-xl border transition-all shrink-0 touch-manipulation mb-0.5 ${
+            isStickersOpen
+              ? 'bg-purple-600/30 text-purple-300 border-purple-500/50 shadow scale-105'
+              : 'bg-slate-800 hover:bg-slate-700 active:scale-90 text-purple-400 border-slate-700/60'
+          }`}
+          title="Стикеры"
+        >
+          <Smile className="w-5 h-5 sm:w-4 sm:h-4" />
+        </button>
+
+        {/* Telegram-стильный пикер стикеров */}
+        <StickersPicker
+          isOpen={isStickersOpen}
+          onClose={() => setIsStickersOpen(false)}
+          onSelectSticker={handleSendSticker}
+          onOpenStore={() => {
+            setIsStickersOpen(false);
+            if (onOpenStickerStore) onOpenStickerStore();
+          }}
+        />
 
         {/* Поле для ввода сообщения (textarea как в Telegram для гарантированного удержания клавиатуры на Android) */}
         <div className="flex-1 relative flex items-center">

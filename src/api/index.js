@@ -114,6 +114,18 @@ export const api = {
   // Health
   getHealth: () => request('/health'),
 
+  // Stickers & Sticker Store
+  getMyStickers: () => request('/stickers/my'),
+  getStickerStore: () => request('/stickers/store'),
+  getStickerPack: (id) => request(`/stickers/pack/${id}`),
+  createStickerPack: (formData) => request('/stickers/pack', { method: 'POST', body: formData }),
+  addStickerToPack: (packId, formData) => request(`/stickers/pack/${packId}/sticker`, { method: 'POST', body: formData }),
+  deleteSticker: (stickerId) => request(`/stickers/sticker/${stickerId}`, { method: 'DELETE' }),
+  deleteStickerPack: (packId) => request(`/stickers/pack/${packId}`, { method: 'DELETE' }),
+  installStickerPack: (packId) => request(`/stickers/pack/${packId}/install`, { method: 'POST' }),
+  uninstallStickerPack: (packId) => request(`/stickers/pack/${packId}/install`, { method: 'DELETE' }),
+  sendSticker: (data) => request('/images/send', { method: 'POST', body: data }),
+
   // Web Push & App Notifications
   getPushPublicKey: () => request('/push/public-key'),
   subscribePush: (subscription, clientType) => request('/push/subscribe', { method: 'POST', body: { subscription, clientType } }),

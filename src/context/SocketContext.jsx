@@ -95,6 +95,13 @@ export function SocketProvider({ children }) {
       if (token) {
         newSocket.emit('authenticate', token);
       }
+      newSocket.emit('get_online_users');
+    });
+
+    newSocket.on('online_users_list', ({ userIds }) => {
+      if (Array.isArray(userIds)) {
+        setOnlineUsers(new Set(userIds.map(Number)));
+      }
     });
 
     newSocket.on('user_online', ({ userId }) => {
@@ -312,12 +319,13 @@ export function SocketProvider({ children }) {
 
   const markAsRead = (friendId) => {
     if (!friendId) return;
-    setUnreadMap((prev) => {
-      const next = { ...prev };
-      delete next[Number(friendId)];
-      return next;
-    });
-    api.markChatRead(friendId).catch(() => {});
+    const numId = Number(friendId);
+    setUnreadMap((prev) => ({
+      ...prev,
+      [numId]: 0
+    }));
+    api.markChatRead(numId).catch(() => {});
+    window.dispatchEvent(new CustomEvent('picshare_friend_read', { detail: { friendId: numId } }));
   };
 
   const clearNotification = () => setNotification(null);
