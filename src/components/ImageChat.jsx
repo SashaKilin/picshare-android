@@ -671,8 +671,8 @@ export function ImageChat({
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-700 object-cover bg-slate-800 group-hover:border-indigo-400"
                 />
                 <span
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-900 ${
-                    isOnline ? 'bg-emerald-500' : 'bg-slate-600'
+                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-900 transition-colors ${
+                    isOnline ? 'bg-emerald-500 animate-online-pulse' : 'bg-slate-600'
                   }`}
                 />
               </div>
@@ -898,7 +898,7 @@ export function ImageChat({
                         />
 
                         {activeReaction && (
-                          <span className="absolute bottom-2 right-2 text-base bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full shadow-lg animate-bounce-short">
+                          <span className="absolute bottom-2 right-2 text-base bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full shadow-lg animate-reaction-pop">
                             {activeReaction}
                           </span>
                         )}
@@ -1016,24 +1016,24 @@ export function ImageChat({
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleAddReaction(img.id, '❤️')}
-                            className="hover:scale-125 transition transform"
+                            className="hover:scale-125 active:scale-150 transition transform touch-manipulation"
                           >
                             ❤️
                           </button>
                           <button
                             onClick={() => handleAddReaction(img.id, '🔥')}
-                            className="hover:scale-125 transition transform"
+                            className="hover:scale-125 active:scale-150 transition transform touch-manipulation"
                           >
                             🔥
                           </button>
                           <button
                             onClick={() => handleAddReaction(img.id, '👍')}
-                            className="hover:scale-125 transition transform"
+                            className="hover:scale-125 active:scale-150 transition transform touch-manipulation"
                           >
                             👍
                           </button>
                           {activeReaction && (
-                            <span className="ml-1 text-xs">{activeReaction}</span>
+                            <span className="ml-1 text-xs animate-reaction-pop inline-block">{activeReaction}</span>
                           )}
                         </div>
 
@@ -1198,12 +1198,12 @@ export function ImageChat({
         <button
           type="submit"
           disabled={sending}
-          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition shrink-0 touch-manipulation active:scale-95 flex items-center gap-1.5 ${
-            hasContentToSend ? 'opacity-100 shadow-indigo-600/30' : 'opacity-40 cursor-pointer'
-          }`}
+          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition-all duration-200 shrink-0 touch-manipulation active:scale-90 flex items-center gap-1.5 ${
+            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95 cursor-pointer'
+          } ${sending ? 'animate-send-pop' : ''}`}
           title="Отправить (Enter)"
         >
-          <Send className="w-4 h-4" />
+          <Send className={`w-4 h-4 transition-transform duration-200 ${sending ? '-translate-y-0.5 translate-x-0.5' : ''}`} />
           <span className="hidden sm:inline text-xs">{sending ? 'Отправка...' : 'Отправить'}</span>
         </button>
       </form>

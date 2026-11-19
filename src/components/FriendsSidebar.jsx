@@ -204,7 +204,7 @@ export function FriendsSidebar({
 
       {/* Список: ДРУЗЬЯ И ИЗБРАННОЕ */}
       {activeTab === 'friends' && (
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar animate-tab-slide">
           
           {/* КАРТОЧКА: «ИЗБРАННОЕ» (Чат с самим собой как в Telegram) */}
           {(!filter || 'избранное'.includes(filter.toLowerCase())) && user && (
@@ -321,8 +321,8 @@ export function FriendsSidebar({
                     className="w-11 h-11 rounded-full border border-slate-700 object-cover bg-slate-800"
                   />
                   <span
-                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 ${
-                      isOnline ? 'bg-emerald-500' : 'bg-slate-600'
+                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 transition-colors ${
+                      isOnline ? 'bg-emerald-500 animate-online-pulse' : 'bg-slate-600'
                     }`}
                     title={isOnline ? 'В сети' : 'Не в сети'}
                   />
@@ -387,7 +387,7 @@ export function FriendsSidebar({
                     </div>
 
                     {unreadCount > 0 && (
-                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-bold text-white bg-indigo-500 rounded-full animate-bounce shadow-md shrink-0">
+                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-bold text-white bg-indigo-500 rounded-full shadow-md shrink-0 animate-badge-pop">
                         {unreadCount}
                       </span>
                     )}
@@ -401,7 +401,7 @@ export function FriendsSidebar({
 
       {/* Список: ГРУППЫ */}
       {activeTab === 'groups' && (
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar animate-tab-slide">
           {groups.length === 0 && (
             <div className="p-6 text-center space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
