@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
 import { 
   Search, 
   UserPlus, 
-  Image, 
+  Image as ImageIcon, 
   Users, 
   Sparkles, 
   Plus, 
   MessageSquare, 
-  Crown
+  Crown,
+  Pin,
+  Bookmark,
+  Check,
+  CheckCheck
 } from 'lucide-react';
+
+function formatChatTime(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  if (isToday) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) {
+    return 'Вчера';
+  }
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
 
 export function FriendsSidebar({
   friends = [],
@@ -24,18 +46,81 @@ export function FriendsSidebar({
   loading = false,
   className = '',
 }) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'groups'
   const [filter, setFilter] = useState('');
   const { onlineUsers, unreadMap } = useSocket();
 
+  // Состояние закреплённых диалогов (сохраняется в localStorage)
+  const [pinnedChats, setPinnedChats] = useState(() => {
+    try {
+      const saved = localStorage.getItem('picshare_pinned_chats');
+      return saved ? JSON.parse(saved) : { friends: [], groups: [] };
+    } catch (e) {
+      return { friends: [], groups: [] };
+    }
+  });
+
+  const togglePin = (type, id, e) => {
+    e.stopPropagation();
+    setPinnedChats((prev) => {
+      const currentList = prev[type] || [];
+      const numId = Number(id);
+      const isPinned = currentList.includes(numId);
+      const nextList = isPinned ? currentList.filter((x) => x !== numId) : [numId, ...currentList];
+      const updated = { ...prev, [type]: nextList };
+      try {
+        localStorage.setItem('picshare_pinned_chats', JSON.stringify(updated));
+      } catch (err) {}
+      return updated;
+    });
+  };
+
+  const isFriendPinned = (id) => (pinnedChats.friends || []).includes(Number(id));
+  const isGroupPinned = (id) => (pinnedChats.groups || []).includes(Number(id));
+
+  // Фильтрация друзей
   const filteredFriends = friends.filter((f) =>
     f.username.toLowerCase().includes(filter.toLowerCase()) ||
     (f.email && f.email.toLowerCase().includes(filter.toLowerCase()))
   );
 
+  // Сортировка друзей: сначала закреплённые, затем по дате последнего сообщения (новые выше)
+  const sortedFriends = [...filteredFriends].sort((a, b) => {
+    const aPin = isFriendPinned(a.id);
+    const bPin = isFriendPinned(b.id);
+    if (aPin && !bPin) return -1;
+    if (!aPin && bPin) return 1;
+
+    const timeA = a.last_image_at ? new Date(a.last_image_at).getTime() : 0;
+    const timeB = b.last_image_at ? new Date(b.last_image_at).getTime() : 0;
+    if (timeA !== timeB) return timeB - timeA;
+
+    const sinceA = a.friends_since ? new Date(a.friends_since).getTime() : 0;
+    const sinceB = b.friends_since ? new Date(b.friends_since).getTime() : 0;
+    return sinceB - sinceA;
+  });
+
+  // Фильтрация и сортировка групп
   const filteredGroups = groups.filter((g) =>
     g.name.toLowerCase().includes(filter.toLowerCase()) ||
     (g.description && g.description.toLowerCase().includes(filter.toLowerCase()))
+  );
+
+  const sortedGroups = [...filteredGroups].sort((a, b) => {
+    const aPin = isGroupPinned(a.id);
+    const bPin = isGroupPinned(b.id);
+    if (aPin && !bPin) return -1;
+    if (!aPin && bPin) return 1;
+
+    const timeA = a.last_message_at ? new Date(a.last_message_at).getTime() : (a.created_at ? new Date(a.created_at).getTime() : 0);
+    const timeB = b.last_message_at ? new Date(b.last_message_at).getTime() : (b.created_at ? new Date(b.created_at).getTime() : 0);
+    return timeB - timeA;
+  });
+
+  const isSavedSelected = Boolean(
+    !selectedGroup && 
+    (selectedFriend?.isSaved || (selectedFriend && user && Number(selectedFriend.id) === Number(user.id)))
   );
 
   return (
@@ -56,11 +141,11 @@ export function FriendsSidebar({
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              <span>Друзья</span>
+              <span>Чаты</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                 activeTab === 'friends' ? 'bg-indigo-500/50 text-white' : 'bg-slate-700 text-slate-400'
               }`}>
-                {friends.length}
+                {friends.length + 1}
               </span>
             </button>
 
@@ -82,7 +167,7 @@ export function FriendsSidebar({
             </button>
           </div>
 
-          {/* Кнопка действия (в зависимости от активной вкладки) */}
+          {/* Кнопка действия */}
           {activeTab === 'friends' ? (
             <button
               onClick={onOpenSearch}
@@ -111,22 +196,66 @@ export function FriendsSidebar({
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder={activeTab === 'friends' ? 'Поиск по друзьям...' : 'Поиск по группам...'}
+            placeholder={activeTab === 'friends' ? 'Поиск по чатам...' : 'Поиск по группам...'}
             className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl pl-9 pr-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
           />
         </div>
       </div>
 
-      {/* Список: ДРУЗЬЯ */}
+      {/* Список: ДРУЗЬЯ И ИЗБРАННОЕ */}
       {activeTab === 'friends' && (
         <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+          
+          {/* КАРТОЧКА: «ИЗБРАННОЕ» (Чат с самим собой как в Telegram) */}
+          {(!filter || 'избранное'.includes(filter.toLowerCase())) && user && (
+            <button
+              onClick={() => {
+                onSelectFriend({
+                  id: user.id,
+                  username: 'Избранное',
+                  email: user.email || '',
+                  avatar: null,
+                  isSaved: true
+                });
+              }}
+              className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
+                isSavedSelected
+                  ? 'bg-indigo-600/25 border border-indigo-500/50 text-white shadow-sm'
+                  : 'hover:bg-slate-800/60 border border-indigo-500/10 text-slate-300'
+              }`}
+            >
+              <div className="relative shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
+                  <Bookmark className="w-5 h-5 fill-white/25" />
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="font-semibold text-sm truncate text-slate-100 flex items-center gap-1.5">
+                    <span>Избранное</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded-md bg-indigo-500/20 text-indigo-300">
+                      Вы
+                    </span>
+                  </span>
+                  <span className="text-[10px] font-medium text-indigo-400/80 shrink-0">
+                    Облако
+                  </span>
+                </div>
+                <div className="text-xs text-slate-400 truncate mt-0.5">
+                  Сохранённые сообщения и заметки
+                </div>
+              </div>
+            </button>
+          )}
+
           {loading && (
             <div className="p-6 text-center text-xs text-slate-500 animate-pulse">
               Загрузка списка друзей...
             </div>
           )}
 
-          {!loading && friends.length === 0 && (
+          {!loading && friends.length === 0 && !filter && (
             <div className="p-6 text-center space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
                 <Sparkles className="w-6 h-6" />
@@ -153,18 +282,26 @@ export function FriendsSidebar({
             </div>
           )}
 
-          {filteredFriends.map((friend) => {
-            const isSelected = selectedFriend?.id === friend.id && !selectedGroup;
+          {/* Список взаимных друзей (отсортированный: закреплённые сверху, затем свежие) */}
+          {sortedFriends.map((friend) => {
+            const isSelected = selectedFriend?.id === friend.id && !selectedGroup && !selectedFriend?.isSaved;
             const isOnline = onlineUsers.has(Number(friend.id));
-            const unreadCount = unreadMap?.[Number(friend.id)] || 0;
+            const unreadCount = unreadMap?.[Number(friend.id)] !== undefined 
+              ? unreadMap[Number(friend.id)] 
+              : (Number(friend.unread_count) || 0);
+            const isPinned = isFriendPinned(friend.id);
+            const chatTime = formatChatTime(friend.last_image_at);
+            const isLastMsgFromMe = Number(friend.last_sender_id) === Number(user?.id);
 
             return (
               <button
                 key={friend.id}
                 onClick={() => onSelectFriend(friend)}
-                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] ${
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
                   isSelected
                     ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-sm'
+                    : isPinned
+                    ? 'bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/40 text-slate-300'
                     : 'hover:bg-slate-800/60 border border-transparent text-slate-300'
                 }`}
               >
@@ -197,19 +334,63 @@ export function FriendsSidebar({
                       {friend.username}
                     </span>
 
-                    {unreadCount > 0 ? (
-                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-bold text-white bg-indigo-500 rounded-full animate-bounce shadow-md">
-                        +{unreadCount}
-                      </span>
-                    ) : friend.total_images > 0 ? (
-                      <span className="flex items-center gap-0.5 text-[11px] text-slate-400 shrink-0">
-                        <Image className="w-3 h-3 text-indigo-400" />
-                        <span>{friend.total_images}</span>
-                      </span>
-                    ) : null}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {chatTime && (
+                        <span className="text-[10px] text-slate-500">
+                          {chatTime}
+                        </span>
+                      )}
+
+                      {/* Кнопка закрепления */}
+                      <button
+                        type="button"
+                        onClick={(e) => togglePin('friends', friend.id, e)}
+                        className={`p-1 rounded-lg transition touch-manipulation active:scale-90 ${
+                          isPinned 
+                            ? 'text-indigo-400 bg-indigo-500/10' 
+                            : 'text-slate-600 hover:text-slate-300 hover:bg-slate-800'
+                        }`}
+                        title={isPinned ? 'Открепить чат' : 'Закрепить чат'}
+                      >
+                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-indigo-400' : ''}`} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-500 truncate mt-0.5">
-                    {friend.email}
+
+                  <div className="flex items-center justify-between gap-1 mt-0.5">
+                    <div className="text-xs text-slate-400 truncate flex-1 flex items-center gap-1 min-w-0">
+                      {friend.last_caption || friend.last_file_url ? (
+                        <>
+                          {isLastMsgFromMe && (
+                            <span className="flex items-center gap-0.5 text-slate-400 shrink-0 font-medium text-[11px]">
+                              {Boolean(friend.last_is_read) ? (
+                                <CheckCheck className="w-3.5 h-3.5 text-sky-400 shrink-0" title="Прочитано" />
+                              ) : (
+                                <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" title="Доставлено" />
+                              )}
+                              <span>Вы:</span>
+                            </span>
+                          )}
+
+                          {friend.last_caption ? (
+                            <span className="text-slate-300 truncate">{friend.last_caption}</span>
+                          ) : (
+                            <span className="text-indigo-400 flex items-center gap-1 truncate">
+                              <ImageIcon className="w-3 h-3 inline shrink-0" />
+                              <span>Фотография</span>
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-slate-500 italic text-[11px]">Пока нет сообщений</span>
+                      )}
+                    </div>
+
+                    {unreadCount > 0 && (
+                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-bold text-white bg-indigo-500 rounded-full animate-bounce shadow-md shrink-0">
+                        {unreadCount}
+                      </span>
+                    )}
                   </div>
                 </div>
               </button>
@@ -248,16 +429,20 @@ export function FriendsSidebar({
             </div>
           )}
 
-          {filteredGroups.map((grp) => {
+          {sortedGroups.map((grp) => {
             const isSelected = selectedGroup?.id === grp.id;
+            const isPinned = isGroupPinned(grp.id);
+            const chatTime = formatChatTime(grp.last_message_at);
 
             return (
               <button
                 key={grp.id}
                 onClick={() => onSelectGroup(grp)}
-                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] ${
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
                   isSelected
                     ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-sm'
+                    : isPinned
+                    ? 'bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/40 text-slate-300'
                     : 'hover:bg-slate-800/60 border border-transparent text-slate-300'
                 }`}
               >
@@ -282,16 +467,54 @@ export function FriendsSidebar({
                     <span className="font-semibold text-sm truncate text-slate-200">
                       {grp.name}
                     </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {chatTime && (
+                        <span className="text-[10px] text-slate-500">
+                          {chatTime}
+                        </span>
+                      )}
+
+                      {/* Кнопка закрепления */}
+                      <button
+                        type="button"
+                        onClick={(e) => togglePin('groups', grp.id, e)}
+                        className={`p-1 rounded-lg transition touch-manipulation active:scale-90 ${
+                          isPinned 
+                            ? 'text-indigo-400 bg-indigo-500/10' 
+                            : 'text-slate-600 hover:text-slate-300 hover:bg-slate-800'
+                        }`}
+                        title={isPinned ? 'Открепить группу' : 'Закрепить группу'}
+                      >
+                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-indigo-400' : ''}`} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-400 truncate mt-0.5 flex items-center gap-1.5">
-                    <span className="text-indigo-400 font-medium">
-                      {grp.members_count || 1} {getMembersWord(grp.members_count || 1)}
-                    </span>
-                    {grp.description && (
-                      <>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-500 truncate">{grp.description}</span>
-                      </>
+
+                  <div className="text-xs text-slate-400 truncate mt-0.5 flex items-center gap-1.5 min-w-0">
+                    {grp.last_caption || grp.last_file_url ? (
+                      <div className="flex items-center gap-1 min-w-0 truncate">
+                        {Number(grp.last_sender_id) === Number(user?.id) ? (
+                          <span className="text-indigo-400 font-medium text-[11px] shrink-0">Вы:</span>
+                        ) : grp.last_sender_username ? (
+                          <span className="text-indigo-300 font-medium text-[11px] shrink-0">{grp.last_sender_username}:</span>
+                        ) : null}
+
+                        {grp.last_caption ? (
+                          <span className="text-slate-300 truncate">{grp.last_caption}</span>
+                        ) : (
+                          <span className="text-indigo-400 flex items-center gap-1 truncate">
+                            <ImageIcon className="w-3 h-3 inline shrink-0" />
+                            <span>Фотография</span>
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] truncate">
+                        <span>{grp.members_count || 1} {getMembersWord(grp.members_count || 1)}</span>
+                        <span>•</span>
+                        <span className="italic">Пока нет сообщений</span>
+                      </div>
                     )}
                   </div>
                 </div>

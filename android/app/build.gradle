@@ -7,8 +7,8 @@ android {
         applicationId "com.sashakilin.picshare"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "1.1.0"
+        versionCode 6
+        versionName "2.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +16,20 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        releaseKey {
+            storeFile file('picshare.keystore')
+            storePassword 'picshare123'
+            keyAlias 'picshare'
+            keyPassword 'picshare123'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.releaseKey
+        }
         release {
+            signingConfig signingConfigs.releaseKey
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -293,6 +293,60 @@ function MainApp() {
       setSelectedGroup((prev) => (prev?.id === groupId ? null : prev));
     };
 
+    const handleNewImage = (newImg) => {
+      if (!newImg) return;
+      if (newImg.group_id) {
+        setGroups((prev) => {
+          const idx = prev.findIndex((g) => g.id === Number(newImg.group_id));
+          if (idx === -1) return prev;
+          const updated = {
+            ...prev[idx],
+            last_message_at: newImg.created_at,
+            last_caption: newImg.caption,
+            last_file_url: newImg.file_url,
+            last_sender_id: newImg.sender_id,
+            last_sender_username: newImg.sender_username
+          };
+          const next = [...prev];
+          next.splice(idx, 1);
+          return [updated, ...next];
+        });
+      } else {
+        const isMyMsg = Number(newImg.sender_id) === Number(user?.id);
+        const otherId = isMyMsg
+          ? Number(newImg.receiver_id)
+          : Number(newImg.sender_id);
+
+        setFriends((prev) => {
+          const idx = prev.findIndex((f) => Number(f.id) === otherId);
+          if (idx === -1) return prev;
+          const updated = {
+            ...prev[idx],
+            last_image_at: newImg.created_at,
+            last_caption: newImg.caption,
+            last_file_url: newImg.file_url,
+            last_sender_id: newImg.sender_id,
+            last_is_read: newImg.is_read || (isMyMsg ? 0 : 1),
+            unread_count: isMyMsg ? (prev[idx].unread_count || 0) : ((prev[idx].unread_count || 0) + 1),
+            total_images: (prev[idx].total_images || 0) + (newImg.file_url ? 1 : 0)
+          };
+          const next = [...prev];
+          next.splice(idx, 1);
+          return [updated, ...next];
+        });
+      }
+    };
+
+    const handleMessagesRead = ({ readerId }) => {
+      setFriends((prev) =>
+        prev.map((f) =>
+          Number(f.id) === Number(readerId) ? { ...f, last_is_read: 1 } : f
+        )
+      );
+    };
+
+    socket.on('new_image', handleNewImage);
+    socket.on('messages_read', handleMessagesRead);
     socket.on('new_friend_request', handleReq);
     socket.on('friend_request_accepted', handleAccepted);
     socket.on('friend_removed', handleRemoved);
@@ -306,6 +360,8 @@ function MainApp() {
     socket.on('removed_from_group', handleRemovedFromGroup);
 
     return () => {
+      socket.off('new_image', handleNewImage);
+      socket.off('messages_read', handleMessagesRead);
       socket.off('new_friend_request', handleReq);
       socket.off('friend_request_accepted', handleAccepted);
       socket.off('friend_removed', handleRemoved);

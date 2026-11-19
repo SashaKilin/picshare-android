@@ -19,7 +19,10 @@ import {
   ArrowDown,
   User,
   Reply,
-  Users
+  Users,
+  Bookmark,
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -148,6 +151,7 @@ export function ImageChat({
 
   const isGroup = Boolean(group);
   const targetId = isGroup ? group.id : friend?.id;
+  const isSaved = Boolean(!isGroup && (friend?.isSaved || (friend && user && Number(friend.id) === Number(user.id))));
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -264,6 +268,11 @@ export function ImageChat({
             return [...prev, newImg];
           });
 
+          // Если чат открыт и сообщение входящее, сразу помечаем прочитанным
+          if (sId === fId) {
+            api.markChatRead(friend.id).catch(() => {});
+          }
+
           if (isNearBottomRef.current || sId === myId || isInputFocused) {
             scrollToBottom(true);
           } else {
@@ -278,12 +287,24 @@ export function ImageChat({
       setImages((prev) => prev.filter((img) => img.id !== imageId));
     };
 
+    const handleMessagesRead = ({ readerId }) => {
+      if (!isGroup && friend && Number(readerId) === Number(friend.id)) {
+        setImages((prev) =>
+          prev.map((msg) =>
+            Number(msg.sender_id) === Number(user.id) ? { ...msg, is_read: true } : msg
+          )
+        );
+      }
+    };
+
     socket.on('new_image', handleNewImage);
     socket.on('image_deleted', handleDeletedImage);
+    socket.on('messages_read', handleMessagesRead);
 
     return () => {
       socket.off('new_image', handleNewImage);
       socket.off('image_deleted', handleDeletedImage);
+      socket.off('messages_read', handleMessagesRead);
     };
   }, [socket, friend?.id, user?.id]);
 
@@ -559,7 +580,7 @@ export function ImageChat({
 
   return (
     <div 
-      className="flex-1 min-h-0 flex flex-col h-full bg-slate-950 relative overflow-hidden"
+      className="flex-1 min-h-0 flex flex-col h-full bg-slate-950 relative overflow-hidden animate-chat-enter"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -616,6 +637,26 @@ export function ImageChat({
                 </div>
               </div>
             </div>
+          ) : isSaved ? (
+            /* Шапка для «Избранного» */
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 select-none">
+              <div className="relative shrink-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30">
+                  <Bookmark className="w-5 h-5 fill-white/20" />
+                </div>
+              </div>
+
+              <div className="min-w-0">
+                <div className="font-bold text-sm text-slate-100 flex items-center gap-1.5 truncate">
+                  <span className="truncate">Избранное</span>
+                </div>
+                <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                  <span className="text-indigo-400/90 font-medium">Ваше личное облако</span>
+                  <span className="text-slate-600">•</span>
+                  <span>Заметки и фото</span>
+                </div>
+              </div>
+            </div>
           ) : (
             /* Шапка для диалога 1-на-1 */
             <div 
@@ -652,14 +693,16 @@ export function ImageChat({
 
         {/* Меню действий */}
         <div className="relative shrink-0 flex items-center gap-1">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
+          {!isSaved && (
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          )}
 
-          {showMenu && (
+          {showMenu && !isSaved && (
             <div className="absolute right-0 top-full mt-1 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-1 z-30">
               {isGroup ? (
                 <button
@@ -728,17 +771,31 @@ export function ImageChat({
         )}
 
         {!loading && images.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-3">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-              <FileImage className="w-7 h-7 sm:w-8 sm:h-8" />
+          isSaved ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 animate-fadeIn select-none">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10 animate-pop-scale">
+                <Bookmark className="w-8 h-8 sm:w-10 sm:h-10 fill-indigo-400/20" />
+              </div>
+              <div className="space-y-1.5 max-w-sm">
+                <h4 className="font-bold text-slate-100 text-base sm:text-lg">Ваше «Избранное»</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Личное облако для важных заметок, ссылок и фотографий. Отправляйте сюда всё, что хотите сохранить — доступно только вам на любых ваших устройствах!
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold text-slate-200 text-sm sm:text-base">Начните общение!</h4>
-              <p className="text-xs text-slate-400 max-w-xs sm:max-w-sm mt-1">
-                Напишите сообщение или отправьте картинку своему другу.
-              </p>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                <FileImage className="w-7 h-7 sm:w-8 sm:h-8" />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-200 text-sm sm:text-base">Начните общение!</h4>
+                <p className="text-xs text-slate-400 max-w-xs sm:max-w-sm mt-1">
+                  Напишите сообщение или отправьте картинку своему другу.
+                </p>
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Сообщения (текстовые и с картинками) */}
@@ -764,7 +821,7 @@ export function ImageChat({
 
               <div 
                 id={`msg-${img.id}`}
-                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} group animate-fadeIn w-full`}
+                className={`flex flex-col ${isMe ? 'items-end animate-msg-me' : 'items-start animate-msg-other'} group w-full`}
               >
                 
                 <div 
@@ -782,8 +839,15 @@ export function ImageChat({
                   <span className={`text-[11px] sm:text-xs font-semibold ${!isMe && isGroup ? 'text-indigo-300 group-hover/author:underline' : 'text-slate-400'}`}>
                     {isMe ? 'Вы' : img.sender_username || (isGroup ? 'Участник' : friend?.username)}
                   </span>
-                  <span className="text-[10px] text-slate-600">
-                    {new Date(img.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <span className="text-[10px] text-slate-500 flex items-center gap-1 select-none">
+                    <span>{new Date(img.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {isMe && !isGroup && (
+                      Boolean(img.is_read) ? (
+                        <CheckCheck className="w-3.5 h-3.5 text-sky-400 shrink-0" title="Прочитано" />
+                      ) : (
+                        <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" title="Доставлено" />
+                      )
+                    )}
                   </span>
                 </div>
 
@@ -1122,6 +1186,8 @@ export function ImageChat({
                 ? `Ответ для @${replyingTo.sender_username}...`
                 : selectedFile
                 ? 'Добавьте подпись к фото...'
+                : isSaved
+                ? 'Сохранить заметку или фото...'
                 : 'Напишите сообщение...'
             }
             className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
-import { getAuthToken, fixMediaUrls } from '../api';
+import { getAuthToken, fixMediaUrls, api } from '../api';
 import { sendBrowserNotification } from '../utils/browserNotifications';
 import { getServerUrl } from '../config';
 import { Capacitor } from '@capacitor/core';
@@ -247,6 +247,7 @@ export function SocketProvider({ children }) {
       delete next[Number(friendId)];
       return next;
     });
+    api.markChatRead(friendId).catch(() => {});
   };
 
   const clearNotification = () => setNotification(null);

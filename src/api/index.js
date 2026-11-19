@@ -108,6 +108,7 @@ export const api = {
   getChatImages: (friendId) => request(`/images/chat/${friendId}`),
   getGroupChatImages: (groupId) => request(`/images/chat/group/${groupId}`),
   deleteImage: (imageId) => request(`/images/${imageId}`, { method: 'DELETE' }),
+  markChatRead: (friendId) => request(`/images/read/${friendId}`, { method: 'POST' }),
   getFeed: () => request('/images/feed'),
 
   // Health
