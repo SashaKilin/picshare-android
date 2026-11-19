@@ -525,13 +525,13 @@ export function ImageChat({
     setCaption('');
     if (captionInputRef.current) {
       captionInputRef.current.value = '';
+      captionInputRef.current.style.height = '42px';
     }
     setReplyingTo(null);
     clearSelectedFile();
 
     // 2. Удерживаем клавиатуру открытой на Android!
     captionInputRef.current?.focus();
-    Keyboard?.show?.().catch?.(() => {});
 
     // 3. Создаём оптимистичное сообщение со статусом отправки (часики как в Telegram)
     const optimisticMessage = {
@@ -609,7 +609,6 @@ export function ImageChat({
     } finally {
       setSending(false);
       captionInputRef.current?.focus();
-      Keyboard?.show?.().catch?.(() => {});
     }
   }
 
@@ -1266,13 +1265,9 @@ export function ImageChat({
         </div>
       )}
 
-      {/* 3. Панель ввода и отправки */}
-      <form 
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSendImage(e);
-        }}
-        className="p-2 sm:p-3 bg-slate-900/95 border-t border-slate-800 flex items-center gap-2 safe-bottom shrink-0 z-20"
+      {/* 3. Панель ввода и отправки (div вместо form, чтобы избежать нативного IME закрытия при submit) */}
+      <div 
+        className="p-2 sm:p-3 bg-slate-900/95 border-t border-slate-800 flex items-end gap-2 safe-bottom shrink-0 z-20"
       >
         <input
           type="file"
@@ -1285,26 +1280,33 @@ export function ImageChat({
         {/* Кнопка выбора фото/камеры */}
         <button
           type="button"
+          tabIndex={-1}
+          onPointerDown={(e) => {
+            // Предотвращаем потерю фокуса у textarea при клике на камеру
+            e.preventDefault();
+          }}
           onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 text-indigo-400 border border-slate-700/60 transition-transform shrink-0 touch-manipulation"
+          className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 text-indigo-400 border border-slate-700/60 transition-transform shrink-0 touch-manipulation mb-0.5"
           title="Прикрепить фото или сделать снимок"
         >
           <Camera className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
 
-        {/* Поле для ввода сообщения или подписи */}
-        <div className="flex-1 relative">
-          <input
-            type="text"
+        {/* Поле для ввода сообщения (textarea как в Telegram для гарантированного удержания клавиатуры на Android) */}
+        <div className="flex-1 relative flex items-center">
+          <textarea
             ref={captionInputRef}
+            rows={1}
             value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            onInput={(e) => setCaption(e.target.value)}
-            onCompositionEnd={(e) => setCaption(e.target.value)}
+            onChange={(e) => {
+              setCaption(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSendImage(e);
+                handleSendImage();
               }
             }}
             onFocus={() => {
@@ -1315,7 +1317,6 @@ export function ImageChat({
             autoComplete="on"
             autoCorrect="on"
             spellCheck="true"
-            inputMode="text"
             placeholder={
               replyingTo
                 ? `Ответ для @${replyingTo.sender_username}...`
@@ -1325,35 +1326,32 @@ export function ImageChat({
                 ? 'Сохранить заметку или фото...'
                 : 'Напишите сообщение...'
             }
-            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200"
+            className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition-all duration-200 resize-none max-h-28 overflow-y-auto custom-scrollbar leading-relaxed"
+            style={{ minHeight: '42px', height: '42px', maxHeight: '120px' }}
           />
         </div>
 
         {/* Кнопка отправки */}
         <button
           type="button"
-          onMouseDown={(e) => {
-            // Предотвращаем потерю фокуса при клике мышью на десктопе
+          tabIndex={-1}
+          onPointerDown={(e) => {
+            // КРИТИЧНО ДЛЯ ANDROID: onPointerDown preventDefault полностью блокирует снятие фокуса с поля ввода
             e.preventDefault();
-          }}
-          onTouchStart={(e) => {
-            // КРИТИЧНО ДЛЯ ANDROID: нажатие на кнопку не забирает фокус у input, благодаря чему виртуальная клавиатура НЕ закрывается!
-            e.preventDefault();
-            handleSendImage(e);
           }}
           onClick={(e) => {
-            handleSendImage(e);
+            e.preventDefault();
+            handleSendImage();
           }}
-          disabled={!hasContentToSend}
-          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition-all duration-200 shrink-0 touch-manipulation active:scale-90 flex items-center gap-1.5 ${
-            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95 cursor-not-allowed'
+          className={`p-2.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-semibold shadow-md transition-all duration-200 shrink-0 touch-manipulation active:scale-90 flex items-center gap-1.5 mb-0.5 ${
+            hasContentToSend ? 'opacity-100 shadow-indigo-600/30 scale-100' : 'opacity-40 scale-95'
           } ${sending ? 'animate-send-pop' : ''}`}
           title="Отправить (Enter)"
         >
           <Send className={`w-4 h-4 transition-transform duration-200 ${hasContentToSend ? 'translate-x-0' : ''}`} />
           <span className="hidden sm:inline text-xs">Отправить</span>
         </button>
-      </form>
+      </div>
 
     </div>
   );
