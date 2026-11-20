@@ -34,10 +34,17 @@ export function StickersPicker({ isOpen, onClose, onSelectSticker, onOpenStore }
   const currentPack = myPacks.find((p) => p.id === selectedPackId) || myPacks[0];
 
   return (
-    <div 
-      className="absolute bottom-full left-0 right-0 sm:left-2 sm:right-auto sm:w-96 mb-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-3xl shadow-2xl z-30 flex flex-col overflow-hidden animate-modal-spring max-h-80 select-none"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <>
+      {/* Невидимый оверлей для закрытия пикера по тапу снаружи */}
+      <div 
+        className="fixed inset-0 z-40" 
+        onClick={onClose} 
+      />
+
+      <div 
+        className="absolute bottom-full left-2 right-2 sm:left-2 sm:right-auto sm:w-96 mb-3 bg-slate-900/95 backdrop-blur-xl border border-slate-750/80 rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden animate-modal-spring max-h-80 select-none"
+        onClick={(e) => e.stopPropagation()}
+      >
       {/* Шапка пикера с названием пака и кнопкой закрытия */}
       <div className="px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/70">
         <div className="flex items-center gap-2 min-w-0">
@@ -156,5 +163,6 @@ export function StickersPicker({ isOpen, onClose, onSelectSticker, onOpenStore }
         </button>
       </div>
     </div>
+    </>
   );
 }

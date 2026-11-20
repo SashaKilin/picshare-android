@@ -547,7 +547,9 @@ export function StickersModal({ isOpen, onClose, onStickersUpdated, initialTab =
                   {myPacks.map((pack) => (
                     <div
                       key={pack.id}
-                      className="p-3.5 sm:p-4 rounded-2xl bg-slate-800/40 border border-slate-700/60 flex items-center justify-between gap-3"
+                      onClick={() => setViewingPack(pack)}
+                      className="p-3.5 sm:p-4 rounded-2xl bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/60 flex items-center justify-between gap-3 cursor-pointer transition active:scale-[0.99]"
+                      title="Нажмите, чтобы просмотреть все стикеры"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img
@@ -567,14 +569,20 @@ export function StickersModal({ isOpen, onClose, onStickersUpdated, initialTab =
                       <div className="flex items-center gap-2 shrink-0">
                         {pack.is_mine && (
                           <button
-                            onClick={() => setEditingPack(pack)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingPack(pack);
+                            }}
                             className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-semibold border border-purple-500/30 transition"
                           >
                             Редактировать
                           </button>
                         )}
                         <button
-                          onClick={() => handleUninstall(pack.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUninstall(pack.id);
+                          }}
                           className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
                           title="Удалить из моих стикеров"
                         >

@@ -26,8 +26,7 @@ import {
   Clock,
   Heart,
   Smile,
-  Paperclip,
-  Phone
+  Paperclip
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { StickersPicker } from './StickersPicker';
@@ -791,8 +790,8 @@ export function ImageChat({
         </div>
       )}
 
-      {/* 1. Шапка чата (Telegram-стиль пузырями со скриншота 3) */}
-      <div className="safe-top px-2.5 py-2 sm:px-4 sm:py-2.5 shrink-0 z-20 flex items-center justify-between gap-2 bg-slate-950/40 backdrop-blur-md">
+      {/* 1. Шапка чата (Telegram-стиль пузырями) */}
+      <div className="safe-top pt-3.5 pb-2 px-3 sm:px-4 sm:pt-4 sm:pb-2.5 shrink-0 z-20 flex items-center justify-between gap-2 bg-slate-950/40 backdrop-blur-md">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack && (
             <button
@@ -902,17 +901,9 @@ export function ImageChat({
           )}
         </div>
 
-        {/* Правый пузырь действий (телефон/профиль + 3 точки, как в ТГ на скрине 3) */}
+        {/* Правый пузырь действий (3 точки, без звонков) */}
         {!isSaved && (
-          <div className="relative shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800/80 shadow-md backdrop-blur-md">
-            <button
-              onClick={() => isGroup ? (onOpenGroupInfo && onOpenGroupInfo(group)) : (onOpenProfile && onOpenProfile(friend?.id))}
-              className="p-1.5 rounded-full text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 transition active:scale-90"
-              title={isGroup ? 'О группе' : 'Профиль'}
-            >
-              {isGroup ? <Users className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
-            </button>
-
+          <div className="relative shrink-0 flex items-center px-1.5 py-1 rounded-full bg-slate-900/90 border border-slate-800/80 shadow-md backdrop-blur-md">
             <button
               onClick={() => setShowMenu(!showMenu)}
               className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/80 transition active:scale-90"
@@ -1487,9 +1478,9 @@ export function ImageChat({
         </div>
       )}
 
-      {/* 3. Панель ввода и отправки пузырями (Telegram-стиль со скриншота 4) */}
+      {/* 3. Панель ввода и отправки пузырями (Telegram-стиль) */}
       <div 
-        className="p-2 sm:p-3 pb-2.5 sm:pb-3 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent flex items-end gap-2 safe-bottom shrink-0 z-20"
+        className="relative p-2 sm:p-3 pb-2.5 sm:pb-3 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent flex items-end gap-2 safe-bottom shrink-0 z-30"
       >
         <input
           type="file"
@@ -1517,8 +1508,15 @@ export function ImageChat({
           <button
             type="button"
             tabIndex={-1}
-            onPointerDown={(e) => e.preventDefault()}
-            onClick={() => setIsStickersOpen((prev) => !prev)}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsStickersOpen((prev) => !prev);
+            }}
             className={`p-2 rounded-full transition-all shrink-0 touch-manipulation mb-0.5 ${
               isStickersOpen
                 ? 'bg-purple-600/30 text-purple-300 scale-105'

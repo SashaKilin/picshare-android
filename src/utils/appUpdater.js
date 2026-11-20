@@ -9,7 +9,7 @@ export async function checkAppUpdate() {
     if (resp.ok) {
       const data = await resp.json();
       const remoteVersionCode = Number(data.versionCode || 0);
-      const isNewer = remoteVersionCode > CURRENT_VERSION_CODE || (data.version && data.version !== CURRENT_VERSION);
+      const isNewer = remoteVersionCode > CURRENT_VERSION_CODE;
 
       return {
         hasUpdate: isNewer,
