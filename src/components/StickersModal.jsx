@@ -223,47 +223,47 @@ export function StickersModal({ isOpen, onClose, onStickersUpdated, initialTab =
           </button>
         </div>
 
-        {/* Навигация по табам */}
-        <div className="flex border-b border-slate-800 px-4 pt-2 bg-slate-900/50 gap-2 shrink-0">
+        {/* Навигация по табам (с горизонтальной прокруткой и компактным стилем на смартфонах) */}
+        <div className="flex border-b border-slate-800 px-2 sm:px-4 pt-1.5 sm:pt-2 bg-slate-900/50 gap-1 sm:gap-2 shrink-0 overflow-x-auto no-scrollbar scroll-smooth">
           <button
             onClick={() => { setActiveTab('store'); setEditingPack(null); setViewingPack(null); }}
-            className={`flex items-center gap-2 py-2.5 px-3.5 border-b-2 text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2.5 sm:px-3.5 border-b-2 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all ${
               activeTab === 'store' && !editingPack && !viewingPack
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>Магазин</span>
-            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
+            <span className="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
               {storePacks.length}
             </span>
           </button>
 
           <button
             onClick={() => { setActiveTab('my'); setEditingPack(null); setViewingPack(null); }}
-            className={`flex items-center gap-2 py-2.5 px-3.5 border-b-2 text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2.5 sm:px-3.5 border-b-2 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all ${
               activeTab === 'my' && !editingPack && !viewingPack
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <FolderHeart className="w-4 h-4" />
+            <FolderHeart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>Мои стикеры</span>
-            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
+            <span className="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
               {myPacks.length}
             </span>
           </button>
 
           <button
             onClick={() => { setActiveTab('create'); setEditingPack(null); setViewingPack(null); }}
-            className={`flex items-center gap-2 py-2.5 px-3.5 border-b-2 text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2.5 sm:px-3.5 border-b-2 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all ${
               activeTab === 'create' && !editingPack && !viewingPack
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>Создать пак</span>
           </button>
         </div>

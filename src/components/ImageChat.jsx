@@ -264,7 +264,20 @@ export function ImageChat({
             latestImageIdRef.current = Math.max(...loadedImages.map((i) => i.id));
           }
           setLoading(false);
-          scrollToBottom(false);
+          // Мгновенная фиксация скролла в самом низу при загрузке сообщений
+          if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+          }
+          requestAnimationFrame(() => {
+            if (chatContainerRef.current) {
+              chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+          });
+          setTimeout(() => {
+            if (chatContainerRef.current) {
+              chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+          }, 50);
         }
       })
       .catch((err) => {
@@ -278,6 +291,13 @@ export function ImageChat({
       mounted = false;
     };
   }, [targetId, isGroup]);
+
+  // Мгновенная фиксация скролла внизу без рывков при открытии диалога
+  React.useLayoutEffect(() => {
+    if (chatContainerRef.current && !loading) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [targetId, loading]);
 
   // Socket.IO
   useEffect(() => {
@@ -296,7 +316,7 @@ export function ImageChat({
           });
 
           if (isNearBottomRef.current || Number(newImg.sender_id) === myId || isInputFocused) {
-            scrollToBottom(true);
+            scrollToBottom(false);
           } else {
             setNewUnreadCount((c) => c + 1);
             setShowScrollBottom(true);
@@ -320,7 +340,7 @@ export function ImageChat({
           }
 
           if (isNearBottomRef.current || sId === myId || isInputFocused) {
-            scrollToBottom(true);
+            scrollToBottom(false);
           } else {
             setNewUnreadCount((c) => c + 1);
             setShowScrollBottom(true);
@@ -369,7 +389,7 @@ export function ImageChat({
             latestImageIdRef.current = maxId;
             setImages(incomingImages);
             if (isNearBottomRef.current) {
-              scrollToBottom(true);
+              scrollToBottom(false);
             }
           }
         }
@@ -395,18 +415,20 @@ export function ImageChat({
     }
   }
 
-  function scrollToBottom(smooth = true) {
-    setTimeout(() => {
-      const el = chatContainerRef.current;
-      if (el) {
+  function scrollToBottom(smooth = false) {
+    const el = chatContainerRef.current;
+    if (el) {
+      if (smooth) {
         el.scrollTo({
           top: el.scrollHeight,
-          behavior: smooth ? 'smooth' : 'auto'
+          behavior: 'smooth'
         });
+      } else {
+        el.scrollTop = el.scrollHeight;
       }
-      setShowScrollBottom(false);
-      setNewUnreadCount(0);
-    }, 40);
+    }
+    setShowScrollBottom(false);
+    setNewUnreadCount(0);
   }
 
   function handleFileSelect(file) {
@@ -453,9 +475,8 @@ export function ImageChat({
     if (Capacitor.isNativePlatform()) {
       try {
         const handleShow = () => {
-          scrollToBottom(true);
-          setTimeout(() => scrollToBottom(true), 100);
-          setTimeout(() => scrollToBottom(true), 260);
+          scrollToBottom(false);
+          setTimeout(() => scrollToBottom(false), 60);
         };
         const willShowPromise = Keyboard.addListener('keyboardWillShow', handleShow);
         const didShowPromise = Keyboard.addListener('keyboardDidShow', handleShow);
@@ -468,7 +489,7 @@ export function ImageChat({
 
     const handleVisualResize = () => {
       if (document.activeElement === captionInputRef.current) {
-        scrollToBottom(true);
+        scrollToBottom(false);
       }
     };
     if (window.visualViewport) {
@@ -564,7 +585,7 @@ export function ImageChat({
     setCaption('');
     if (captionInputRef.current) {
       captionInputRef.current.value = '';
-      captionInputRef.current.style.height = '42px';
+      captionInputRef.current.style.height = '24px';
     }
     setReplyingTo(null);
     clearSelectedFile();
@@ -605,9 +626,9 @@ export function ImageChat({
       is_read: false
     };
 
-    // 4. Мгновенно отображаем в чате и скроллим вниз
+    // 4. Мгновенно отображаем в чате и фиксируем внизу без рывков
     setImages((prev) => [...prev, optimisticMessage]);
-    scrollToBottom(true);
+    scrollToBottom(false);
 
     if (hasFile) {
       confetti({ particleCount: 25, spread: 40, origin: { y: 0.85 } });
@@ -692,7 +713,7 @@ export function ImageChat({
     };
 
     setImages((prev) => [...prev, optimisticSticker]);
-    scrollToBottom(true);
+    scrollToBottom(false);
 
     try {
       const payload = {
@@ -1502,7 +1523,7 @@ export function ImageChat({
         />
 
         {/* Основной пузырь ввода сообщения: [ 😊 | Сообщение... | 📎 ] */}
-        <div className="flex-1 min-w-0 flex items-end bg-slate-900/90 border border-slate-750/80 rounded-[24px] sm:rounded-full px-1.5 py-1 shadow-lg backdrop-blur-md transition-all focus-within:border-indigo-500/60 focus-within:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
+        <div className="flex-1 min-w-0 flex items-center bg-slate-900/90 border border-slate-750/80 rounded-[24px] sm:rounded-full px-1.5 py-1 min-h-[44px] shadow-lg backdrop-blur-md transition-all focus-within:border-indigo-500/60 focus-within:shadow-[0_0_15px_rgba(99,102,241,0.25)]">
           
           {/* Кнопка стикеров слева внутри пузыря */}
           <button
@@ -1517,7 +1538,7 @@ export function ImageChat({
               e.stopPropagation();
               setIsStickersOpen((prev) => !prev);
             }}
-            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation mb-0.5 ${
+            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation self-center ${
               isStickersOpen
                 ? 'bg-purple-600/30 text-purple-300 scale-105'
                 : 'text-slate-400 hover:text-purple-300 hover:bg-slate-800/60 active:scale-90'
@@ -1528,7 +1549,7 @@ export function ImageChat({
           </button>
 
           {/* Бесшовное поле ввода сообщения без рамок */}
-          <div className="flex-1 min-w-0 px-2 py-0.5">
+          <div className="flex-1 min-w-0 px-2 flex items-center">
             <textarea
               ref={captionInputRef}
               rows={1}
@@ -1537,7 +1558,8 @@ export function ImageChat({
                 const val = e.target.value;
                 setCaption(val);
                 e.target.style.height = 'auto';
-                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                const nextHeight = Math.min(Math.max(e.target.scrollHeight, 24), 110);
+                e.target.style.height = `${nextHeight}px`;
 
                 // Отправка события "печатает..."
                 if (!isSaved && targetId) {
@@ -1568,8 +1590,7 @@ export function ImageChat({
                 }
               }}
               onFocus={() => {
-                setTimeout(() => scrollToBottom(true), 80);
-                setTimeout(() => scrollToBottom(true), 240);
+                scrollToBottom(false);
               }}
               enterKeyHint="send"
               autoComplete="on"
@@ -1584,8 +1605,8 @@ export function ImageChat({
                   ? 'Сохранить заметку...'
                   : 'Сообщение'
               }
-              className="w-full bg-transparent border-0 text-[15px] text-white placeholder-slate-500 focus:outline-none resize-none max-h-28 overflow-y-auto no-scrollbar leading-relaxed py-1"
-              style={{ minHeight: '26px', height: '26px', maxHeight: '110px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="w-full bg-transparent border-0 text-[15px] text-white placeholder-slate-500 focus:outline-none resize-none max-h-28 overflow-y-auto no-scrollbar leading-6 py-0 m-0 block"
+              style={{ minHeight: '24px', height: '24px', maxHeight: '110px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             />
           </div>
 
@@ -1595,7 +1616,7 @@ export function ImageChat({
             tabIndex={-1}
             onPointerDown={(e) => e.preventDefault()}
             onClick={() => fileInputRef.current?.click()}
-            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation mb-0.5 ${
+            className={`p-2 rounded-full transition-all shrink-0 touch-manipulation self-center ${
               selectedFile
                 ? 'text-indigo-400 bg-indigo-500/20'
                 : 'text-slate-400 hover:text-indigo-300 hover:bg-slate-800/60 active:scale-90'
@@ -1622,10 +1643,10 @@ export function ImageChat({
               fileInputRef.current?.click();
             }
           }}
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg touch-manipulation transition-all duration-200 active:scale-90 mb-0.5 ${
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg touch-manipulation transition-all duration-200 active:scale-90 border ${
             hasContentToSend
-              ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 hover:from-indigo-500 text-white shadow-indigo-600/40 scale-100'
-              : 'bg-slate-900/90 hover:bg-slate-800 text-indigo-400 border border-slate-750/80 shadow-md hover:text-white'
+              ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 hover:from-indigo-500 text-white shadow-indigo-600/40 border-transparent'
+              : 'bg-slate-900/90 hover:bg-slate-800 text-indigo-400 border-slate-750/80 shadow-md hover:text-white'
           } ${sending ? 'animate-send-pop' : ''}`}
           title={hasContentToSend ? 'Отправить (Enter)' : 'Сделать фото / выбрать из галереи'}
         >

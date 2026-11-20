@@ -27,7 +27,7 @@ export function Navbar({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-900/90 backdrop-blur-md safe-top">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-1 sm:gap-4">
         
         {/* Логотип */}
         <div 
@@ -37,10 +37,10 @@ export function Navbar({
           <img 
             src="/favicon.svg" 
             alt="PicShare" 
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 object-contain" 
+            className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 object-contain" 
           />
           <div className="flex flex-col">
-            <div className="flex items-center gap-1 font-bold text-base sm:text-lg tracking-tight text-white leading-tight">
+            <div className="flex items-center gap-1 font-bold text-sm sm:text-lg tracking-tight text-white leading-tight">
               <span>PicShare</span>
             </div>
             <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Обмен картинками</p>
@@ -49,13 +49,13 @@ export function Navbar({
 
         {/* Действия и навигация */}
         {isAuthenticated ? (
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             
             {/* Переключение Лента / Чат */}
-            <div className="flex bg-slate-800/80 p-0.5 sm:p-1 rounded-xl border border-slate-700/60">
+            <div className="flex bg-slate-800/80 p-0.5 rounded-xl border border-slate-700/60 shrink-0">
               <button
                 onClick={() => setActiveView('chat')}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeView === 'chat'
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-slate-400 hover:text-slate-200'
@@ -67,7 +67,7 @@ export function Navbar({
               </button>
               <button
                 onClick={() => setActiveView('feed')}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeView === 'feed'
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-slate-400 hover:text-slate-200'
@@ -82,7 +82,7 @@ export function Navbar({
             {/* Найти друзей */}
             <button
               onClick={onOpenSearch}
-              className="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition"
+              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition shrink-0"
               title="Найти друзей"
             >
               <UserPlus className="w-4 h-4 text-indigo-400" />
@@ -92,7 +92,7 @@ export function Navbar({
             {/* Стикеры и магазин стикерпаков */}
             <button
               onClick={onOpenStickers}
-              className="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 text-xs sm:text-sm font-medium border border-purple-500/20 transition active:scale-95"
+              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 sm:px-3 sm:py-1.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 text-xs sm:text-sm font-medium border border-purple-500/20 transition active:scale-95 shrink-0"
               title="Стикеры и Магазин стикерпаков"
             >
               <Smile className="w-4 h-4 text-purple-400" />
@@ -102,7 +102,7 @@ export function Navbar({
             {/* Заявки в друзья */}
             <button
               onClick={onOpenRequests}
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+              className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition shrink-0"
               title="Заявки в друзья"
             >
               <Bell className="w-4 h-4" />
@@ -114,10 +114,10 @@ export function Navbar({
             </button>
 
             {/* Профиль пользователя */}
-            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-800 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-800 shrink-0 pr-0.5">
               <button
                 onClick={() => onOpenProfile && onOpenProfile(user?.id)}
-                className="flex items-center gap-1.5 hover:opacity-85 transition group text-left cursor-pointer p-1 rounded-xl hover:bg-slate-800/50 shrink-0"
+                className="flex items-center gap-1.5 hover:opacity-85 transition group text-left cursor-pointer p-0.5 sm:p-1 rounded-xl hover:bg-slate-800/50 shrink-0"
                 title="Мой профиль"
               >
                 <img
