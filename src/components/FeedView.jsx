@@ -25,57 +25,57 @@ export function FeedView({ onSelectFriend, onOpenLightbox, onOpenProfile }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-950 overflow-y-auto p-3 sm:p-6 lg:p-8">
+    <div className="flex-1 flex flex-col h-full bg-black overflow-y-auto p-3 sm:p-6 lg:p-8 custom-scrollbar">
       <div className="max-w-6xl mx-auto w-full">
         
         {/* Заголовок ленты */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
             <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
+              <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               <span>Общая галерея</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-neutral-400 mt-0.5">
               Все картинки от ваших друзей
             </p>
           </div>
 
           <button
             onClick={loadFeed}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition active:scale-95 touch-manipulation"
+            className="x-btn-secondary px-3.5 py-1.5 rounded-full text-xs font-semibold"
           >
             Обновить
           </button>
         </div>
 
         {loading && (
-          <div className="py-16 text-center text-xs text-slate-500 animate-pulse">
+          <div className="py-16 text-center text-xs text-neutral-400 animate-pulse">
             Загрузка галереи...
           </div>
         )}
 
         {!loading && feed.length === 0 && (
           <div className="py-16 text-center space-y-3">
-            <div className="w-14 h-14 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+            <div className="w-14 h-14 rounded-3xl bg-white/10 border border-white/15 text-white mx-auto flex items-center justify-center">
               <ImageIcon className="w-7 h-7" />
             </div>
-            <h3 className="font-bold text-slate-200 text-sm sm:text-base">В галерее пока пусто</h3>
-            <p className="text-xs text-slate-400 max-w-xs mx-auto">
+            <h3 className="font-bold text-white text-sm sm:text-base">В галерее пока пусто</h3>
+            <p className="text-xs text-neutral-400 max-w-xs mx-auto">
               Отправьте картинку другу в диалоге, и она появится здесь!
             </p>
           </div>
         )}
 
-        {/* Сетка картинок: на мобильном 2 колонки! */}
+        {/* Сетка картинок */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {feed.map((img) => (
             <div
               key={img.id}
-              className="group relative bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-md flex flex-col transition"
+              className="group relative liquid-glass-subtle border border-white/10 hover:border-white/30 rounded-3xl overflow-hidden shadow-lg flex flex-col transition"
             >
               <div
                 onClick={() => onOpenLightbox(img)}
-                className="aspect-square bg-slate-950 overflow-hidden cursor-pointer relative active:opacity-90"
+                className="aspect-square bg-black overflow-hidden cursor-pointer relative active:opacity-90"
               >
                 <img
                   src={img.file_url}
@@ -83,14 +83,14 @@ export function FeedView({ onSelectFriend, onOpenLightbox, onOpenProfile }) {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-2">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-2.5">
                   <a
                     href={img.file_url}
                     download={img.original_name}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="p-1 rounded-lg bg-slate-900/80 text-white hover:bg-slate-800 transition"
+                    className="p-1.5 rounded-full liquid-glass-pill text-white hover:bg-white/20 border border-white/20 transition"
                     title="Скачать"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -98,25 +98,25 @@ export function FeedView({ onSelectFriend, onOpenLightbox, onOpenProfile }) {
                 </div>
               </div>
 
-              <div className="p-2 sm:p-2.5 flex items-center justify-between gap-1.5 border-t border-slate-800">
+              <div className="p-2 sm:p-2.5 flex items-center justify-between gap-1.5 border-t border-white/10 bg-black/40 backdrop-blur-md">
                 <div 
                   onClick={() => onOpenProfile && onOpenProfile(img.sender_id)}
-                  className="flex items-center gap-1.5 min-w-0 cursor-pointer hover:opacity-80 transition group"
+                  className="flex items-center gap-2 min-w-0 cursor-pointer hover:opacity-80 transition group"
                   title="Посмотреть профиль"
                 >
                   <img
                     src={img.sender_avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${img.sender_username}`}
                     alt={img.sender_username}
-                    className="w-5 h-5 rounded-full border border-slate-700 object-cover shrink-0 group-hover:border-indigo-400"
+                    className="w-6 h-6 rounded-full border border-white/15 object-cover shrink-0 group-hover:border-white/40"
                   />
-                  <div className="text-[11px] font-semibold text-slate-200 truncate group-hover:text-indigo-300">
+                  <div className="text-xs font-semibold text-neutral-200 truncate group-hover:text-white">
                     {img.sender_username}
                   </div>
                 </div>
 
                 <button
                   onClick={() => onSelectFriend({ id: img.sender_id, username: img.sender_username, avatar: img.sender_avatar })}
-                  className="p-1 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition shrink-0"
+                  className="p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition shrink-0"
                   title="В диалог"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />

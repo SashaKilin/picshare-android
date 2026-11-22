@@ -175,18 +175,18 @@ export function ProfileModal({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-backdrop-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-xl animate-backdrop-fade"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl max-h-[94dvh] sm:max-h-[90dvh] flex flex-col animate-modal-spring"
+        className="relative w-full max-w-xl liquid-glass-modal border border-white/15 rounded-3xl overflow-hidden shadow-2xl max-h-[94dvh] sm:max-h-[90dvh] flex flex-col animate-modal-spring"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Кнопка закрытия */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-30 p-2.5 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white backdrop-blur-md border border-white/10 transition shadow-lg active:scale-90 touch-manipulation"
+          className="absolute top-3 right-3 z-30 p-2.5 rounded-full liquid-glass-pill text-white hover:bg-white/20 border border-white/15 transition shadow-lg active:scale-90 touch-manipulation"
           title="Закрыть"
         >
           <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -194,20 +194,20 @@ export function ProfileModal({
 
         {loading ? (
           <div className="p-16 flex flex-col items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center animate-spin">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-white flex items-center justify-center animate-spin">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xs text-slate-400 font-medium">Загрузка профиля...</span>
+            <span className="text-xs text-neutral-400 font-medium">Загрузка профиля...</span>
           </div>
         ) : error ? (
           <div className="p-10 sm:p-12 text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 mx-auto flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
               <X className="w-6 h-6" />
             </div>
             <p className="text-sm font-semibold text-rose-300">{error}</p>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold"
+              className="x-btn-secondary px-5 py-2 rounded-full text-xs font-semibold"
             >
               Закрыть
             </button>
@@ -216,7 +216,7 @@ export function ProfileModal({
           <div className="overflow-y-auto flex-1 custom-scrollbar">
             
             {/* 1. БАННЕР ПРОФИЛЯ */}
-            <div className="relative h-28 sm:h-44 w-full bg-slate-950 overflow-hidden">
+            <div className="relative h-28 sm:h-44 w-full bg-black overflow-hidden border-b border-white/10">
               {profileUser.banner && profileUser.banner.startsWith('linear-gradient(') ? (
                 <div style={{ background: profileUser.banner }} className="w-full h-full" />
               ) : profileUser.banner ? (
@@ -226,17 +226,17 @@ export function ProfileModal({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 relative">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-transparent" />
+                <div className="w-full h-full bg-gradient-to-r from-neutral-900 via-neutral-950 to-black relative">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               
               {/* Кнопка поделиться ссылкой на профиль */}
               <button
                 onClick={handleCopyLink}
-                className="absolute top-3 left-3 p-2 sm:py-1.5 sm:px-3 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white backdrop-blur-md border border-white/10 transition shadow-lg flex items-center gap-1.5 text-xs font-medium active:scale-95 touch-manipulation"
+                className="absolute top-3 left-3 p-2 sm:py-1.5 sm:px-3.5 rounded-full liquid-glass-pill text-white hover:bg-white/20 border border-white/15 transition shadow-lg flex items-center gap-1.5 text-xs font-semibold active:scale-95 touch-manipulation"
                 title="Скопировать ссылку на профиль"
               >
                 {copiedLink ? (
@@ -246,8 +246,8 @@ export function ProfileModal({
                   </>
                 ) : (
                   <>
-                    <Share2 className="w-3.5 h-3.5 text-slate-300" />
-                    <span className="hidden sm:inline text-slate-300">Поделиться</span>
+                    <Share2 className="w-3.5 h-3.5 text-neutral-300" />
+                    <span className="hidden sm:inline text-neutral-200">Поделиться</span>
                   </>
                 )}
               </button>
@@ -262,17 +262,17 @@ export function ProfileModal({
                   <img
                     src={profileUser.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${profileUser.username}`}
                     alt={profileUser.username}
-                    className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl sm:rounded-3xl border-4 border-slate-900 object-cover bg-slate-800 shadow-xl"
+                    className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl sm:rounded-3xl border-4 border-black object-cover bg-neutral-900 shadow-2xl"
                   />
                   <span
-                    className={`absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-3 sm:border-4 border-slate-900 ${
-                      isOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/30' : 'bg-slate-600'
+                    className={`absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-3 sm:border-4 border-black ${
+                      isOnline ? 'bg-emerald-400 ring-2 ring-emerald-400/40 shadow-[0_0_10px_rgba(52,211,153,0.5)]' : 'bg-neutral-600'
                     }`}
                     title={isOnline ? 'В сети' : 'Не в сети'}
                   />
                 </div>
 
-                {/* Кнопки действий (на мобильном на всю ширину для удобства пальца) */}
+                {/* Кнопки действий */}
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                   {isSelf ? (
                     <>
@@ -281,7 +281,7 @@ export function ProfileModal({
                           onClose();
                           onOpenEditProfile && onOpenEditProfile();
                         }}
-                        className="flex-1 sm:flex-initial justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                        className="x-btn-primary flex-1 sm:flex-initial justify-center flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition transform active:scale-95 touch-manipulation"
                       >
                         <Edit3 className="w-4 h-4" />
                         <span>Редактировать профиль</span>
@@ -291,7 +291,7 @@ export function ProfileModal({
                           onClose();
                           logout();
                         }}
-                        className="flex-1 sm:flex-initial justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs sm:text-sm font-semibold transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                        className="x-btn-secondary flex-1 sm:flex-initial justify-center flex items-center gap-2 px-4 py-2.5 rounded-full text-neutral-300 hover:text-rose-400 hover:border-rose-500/30 text-xs sm:text-sm font-semibold transition transform active:scale-95 touch-manipulation"
                         title="Выйти из текущего аккаунта"
                       >
                         <LogOut className="w-4 h-4" />
@@ -304,7 +304,7 @@ export function ProfileModal({
                         onClose();
                         onSelectFriend && onSelectFriend(profileUser);
                       }}
-                      className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                      className="x-btn-primary w-full sm:w-auto justify-center flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition transform active:scale-95 touch-manipulation"
                     >
                       <MessageSquare className="w-4 h-4" />
                       <span>Открыть чат</span>
@@ -313,7 +313,7 @@ export function ProfileModal({
                     <button
                       onClick={handleAcceptFriendRequest}
                       disabled={actionLoading}
-                      className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                      className="x-btn-primary w-full sm:w-auto justify-center flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition transform active:scale-95 touch-manipulation"
                     >
                       <UserCheck className="w-4 h-4" />
                       <span>Принять заявку</span>
@@ -321,16 +321,16 @@ export function ProfileModal({
                   ) : profileUser.relationship === 'outgoing_request' ? (
                     <button
                       disabled
-                      className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-800 text-slate-400 text-xs sm:text-sm font-medium border border-slate-700/60 cursor-default"
+                      className="liquid-glass w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 rounded-full text-neutral-400 text-xs sm:text-sm font-medium border border-white/10 cursor-default"
                     >
-                      <Clock className="w-4 h-4 text-amber-400" />
+                      <Clock className="w-4 h-4 text-neutral-400" />
                       <span>Заявка отправлена</span>
                     </button>
                   ) : (
                     <button
                       onClick={handleSendFriendRequest}
                       disabled={actionLoading}
-                      className="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95 touch-manipulation"
+                      className="x-btn-primary w-full sm:w-auto justify-center flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition transform active:scale-95 touch-manipulation"
                     >
                       <UserPlus className="w-4 h-4" />
                       <span>Добавить в друзья</span>
@@ -348,82 +348,82 @@ export function ProfileModal({
                   
                   {/* Бейдж статуса */}
                   {profileUser.badge && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold liquid-glass-pill text-white border border-white/20">
                       {profileUser.badge}
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-neutral-400">
                   {profileUser.email}
                 </p>
               </div>
 
               {/* Описание (Bio) */}
               {profileUser.bio && (
-                <div className="mt-3.5 sm:mt-4 p-3 sm:p-3.5 rounded-2xl bg-slate-800/40 border border-slate-800 text-slate-300 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">
+                <div className="mt-3.5 sm:mt-4 p-3.5 sm:p-4 rounded-2xl liquid-glass-subtle border border-white/10 text-neutral-200 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">
                   {profileUser.bio}
                 </div>
               )}
 
               {/* Дата рождения и дата регистрации */}
-              <div className="mt-3.5 sm:mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-slate-400 border-t border-slate-800/80 pt-3">
+              <div className="mt-3.5 sm:mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-neutral-400 border-t border-white/10 pt-3">
                 {profileUser.birthdate && (
                   <div className="flex items-center gap-1.5">
-                    <Cake className="w-4 h-4 text-pink-400 shrink-0" />
-                    <span>День рождения: <strong className="text-slate-200">{formatBirthdate(profileUser.birthdate)}</strong></span>
+                    <Cake className="w-4 h-4 text-neutral-300 shrink-0" />
+                    <span>День рождения: <strong className="text-white">{formatBirthdate(profileUser.birthdate)}</strong></span>
                   </div>
                 )}
                 
                 {profileUser.created_at && (
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>В PicShare с <strong className="text-slate-200">{formatJoinDate(profileUser.created_at)}</strong></span>
+                    <Calendar className="w-4 h-4 text-neutral-300 shrink-0" />
+                    <span>В PicShare с <strong className="text-white">{formatJoinDate(profileUser.created_at)}</strong></span>
                   </div>
                 )}
               </div>
 
               {/* Статистика */}
               <div className="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3">
-                <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-800/60 border border-slate-800 flex items-center gap-2.5 sm:gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-                    <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className="p-3.5 sm:p-4 rounded-2xl liquid-glass-subtle border border-white/10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-base sm:text-lg font-bold text-white leading-tight">
                       {profileUser.friends_count || 0}
                     </div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-400">Друзей</div>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-400">Друзей</div>
                   </div>
                 </div>
 
-                <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-800/60 border border-slate-800 flex items-center gap-2.5 sm:gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                    <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className="p-3.5 sm:p-4 rounded-2xl liquid-glass-subtle border border-white/10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center shrink-0">
+                    <ImageIcon className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-base sm:text-lg font-bold text-white leading-tight">
                       {profileUser.images_count || 0}
                     </div>
-                    <div className="text-[10px] sm:text-[11px] text-slate-400">Картинок отправлено</div>
+                    <div className="text-[10px] sm:text-[11px] text-neutral-400">Картинок отправлено</div>
                   </div>
                 </div>
               </div>
 
               {/* Блок общих картинок (если друзья) */}
               {profileUser.relationship === 'friends' && profileUser.sharedImages && profileUser.sharedImages.length > 0 && (
-                <div className="mt-4 sm:mt-5 border-t border-slate-800 pt-4">
+                <div className="mt-4 sm:mt-5 border-t border-white/10 pt-4">
                   <div className="flex items-center justify-between mb-2.5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5 text-indigo-400" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-neutral-300" />
                       <span>Совместные фото и картинки</span>
                     </h4>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-neutral-500">
                       Недавние
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     {profileUser.sharedImages.map((img) => (
                       <div
                         key={img.id}
@@ -431,7 +431,7 @@ export function ProfileModal({
                           onClose();
                           onOpenLightbox && onOpenLightbox(img);
                         }}
-                        className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800 hover:border-indigo-500 cursor-pointer relative group transition active:opacity-80 touch-manipulation"
+                        className="aspect-square rounded-2xl overflow-hidden bg-black/60 border border-white/10 hover:border-white/40 cursor-pointer relative group transition active:opacity-80 touch-manipulation"
                       >
                         <img
                           src={img.file_url}

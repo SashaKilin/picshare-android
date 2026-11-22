@@ -124,26 +124,26 @@ export function FriendsSidebar({
   );
 
   return (
-    <aside className={`flex flex-col border-r border-slate-800 bg-slate-900/50 shrink-0 h-full ${className}`}>
+    <aside className={`flex flex-col border-r border-white/10 bg-black/40 backdrop-blur-2xl shrink-0 h-full ${className}`}>
       
       {/* Шапка сайдбара */}
-      <div className="p-3 sm:p-4 border-b border-slate-800 shrink-0">
+      <div className="p-3 sm:p-4 border-b border-white/10 shrink-0">
         
         {/* Вкладки: Друзья (Личные) / Группы */}
         <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
-          <div className="flex bg-slate-800/90 p-1 rounded-xl border border-slate-700/60">
+          <div className="flex bg-neutral-900/80 p-1 rounded-2xl border border-white/10">
             <button
               onClick={() => setActiveTab('friends')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
                 activeTab === 'friends'
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
               <span>Чаты</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                activeTab === 'friends' ? 'bg-indigo-500/50 text-white' : 'bg-slate-700 text-slate-400'
+                activeTab === 'friends' ? 'bg-black/15 text-black font-bold' : 'bg-neutral-800 text-neutral-400'
               }`}>
                 {friends.length + 1}
               </span>
@@ -151,16 +151,16 @@ export function FriendsSidebar({
 
             <button
               onClick={() => setActiveTab('groups')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
                 activeTab === 'groups'
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
               <span>Группы</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                activeTab === 'groups' ? 'bg-indigo-500/50 text-white' : 'bg-slate-700 text-slate-400'
+                activeTab === 'groups' ? 'bg-black/15 text-black font-bold' : 'bg-neutral-800 text-neutral-400'
               }`}>
                 {groups.length}
               </span>
@@ -171,7 +171,7 @@ export function FriendsSidebar({
           {activeTab === 'friends' ? (
             <button
               onClick={onOpenSearch}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-300 border border-indigo-500/20 text-xs font-semibold transition touch-manipulation active:scale-95"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-semibold transition backdrop-blur-xl touch-manipulation active:scale-95"
               title="Найти новых друзей"
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -180,7 +180,7 @@ export function FriendsSidebar({
           ) : (
             <button
               onClick={onOpenCreateGroup}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition touch-manipulation active:scale-95"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-2xl x-btn-primary text-xs font-bold shadow-md transition touch-manipulation active:scale-95"
               title="Создать новую группу"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -191,13 +191,13 @@ export function FriendsSidebar({
 
         {/* Поле поиска */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-500" />
           <input
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder={activeTab === 'friends' ? 'Поиск по чатам...' : 'Поиск по группам...'}
-            className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl pl-9 pr-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full bg-neutral-900/60 border border-white/10 rounded-2xl pl-9 pr-3 py-2 text-base sm:text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition"
           />
         </div>
       </div>
@@ -220,29 +220,29 @@ export function FriendsSidebar({
               }}
               className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
                 isSavedSelected
-                  ? 'bg-indigo-600/25 border border-indigo-500/50 text-white shadow-sm'
-                  : 'hover:bg-slate-800/60 border border-indigo-500/10 text-slate-300'
+                  ? 'liquid-glass-highlight bg-white/10 border border-white/25 text-white shadow-sm'
+                  : 'liquid-glass-subtle hover:bg-white/10 border border-white/10 text-neutral-300'
               }`}
             >
               <div className="relative shrink-0">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
-                  <Bookmark className="w-5 h-5 fill-white/25" />
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-neutral-200 via-white to-neutral-400 flex items-center justify-center text-black shadow-md">
+                  <Bookmark className="w-5 h-5 fill-black/20" />
                 </div>
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
-                  <span className="font-semibold text-sm truncate text-slate-100 flex items-center gap-1.5">
+                  <span className="font-semibold text-sm truncate text-white flex items-center gap-1.5">
                     <span>Избранное</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded-md bg-indigo-500/20 text-indigo-300">
+                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded-md bg-white/15 text-white">
                       Вы
                     </span>
                   </span>
-                  <span className="text-[10px] font-medium text-indigo-400/80 shrink-0">
+                  <span className="text-[10px] font-medium text-neutral-400 shrink-0">
                     Облако
                   </span>
                 </div>
-                <div className="text-xs text-slate-400 truncate mt-0.5">
+                <div className="text-xs text-neutral-400 truncate mt-0.5">
                   Сохранённые сообщения и заметки
                 </div>
               </div>
@@ -250,25 +250,25 @@ export function FriendsSidebar({
           )}
 
           {loading && (
-            <div className="p-6 text-center text-xs text-slate-500 animate-pulse">
+            <div className="p-6 text-center text-xs text-neutral-500 animate-pulse">
               Загрузка списка друзей...
             </div>
           )}
 
           {!loading && friends.length === 0 && !filter && (
             <div className="p-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl liquid-glass text-white border border-white/15 mx-auto flex items-center justify-center shadow-lg">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-300">Друзей пока нет</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-sm font-semibold text-neutral-200">Друзей пока нет</p>
+                <p className="text-xs text-neutral-400 mt-1">
                   Добавьте друзей, чтобы начать обмениваться картинками!
                 </p>
               </div>
               <button
                 onClick={onOpenSearch}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition touch-manipulation active:scale-95"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl x-btn-primary text-xs font-bold shadow-md transition touch-manipulation active:scale-95"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Найти первых друзей</span>
@@ -277,7 +277,7 @@ export function FriendsSidebar({
           )}
 
           {!loading && friends.length > 0 && filteredFriends.length === 0 && (
-            <div className="p-6 text-center text-xs text-slate-500">
+            <div className="p-6 text-center text-xs text-neutral-500">
               Никого не найдено
             </div>
           )}
@@ -299,10 +299,10 @@ export function FriendsSidebar({
                 onClick={() => onSelectFriend(friend)}
                 className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
                   isSelected
-                    ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-sm'
+                    ? 'liquid-glass-highlight bg-white/10 border border-white/20 text-white shadow-sm'
                     : isPinned
-                    ? 'bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/40 text-slate-300'
-                    : 'hover:bg-slate-800/60 border border-transparent text-slate-300'
+                    ? 'bg-neutral-900/60 hover:bg-neutral-900/90 border border-white/10 text-neutral-300'
+                    : 'hover:bg-neutral-900/40 border border-transparent text-neutral-300'
                 }`}
               >
                 <div 
@@ -318,11 +318,11 @@ export function FriendsSidebar({
                   <img
                     src={friend.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${friend.username}`}
                     alt={friend.username}
-                    className="w-11 h-11 rounded-full border border-slate-700 object-cover bg-slate-800"
+                    className="w-11 h-11 rounded-full border border-white/15 object-cover bg-neutral-900"
                   />
                   <span
-                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 transition-colors ${
-                      isOnline ? 'bg-emerald-500 animate-online-pulse' : 'bg-slate-600'
+                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-black transition-colors ${
+                      isOnline ? 'bg-emerald-500 animate-online-pulse' : 'bg-neutral-600'
                     }`}
                     title={isOnline ? 'В сети' : 'Не в сети'}
                   />
@@ -330,13 +330,13 @@ export function FriendsSidebar({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="font-semibold text-sm truncate text-slate-200">
+                    <span className="font-semibold text-sm truncate text-neutral-100">
                       {friend.username}
                     </span>
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {chatTime && (
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-neutral-500">
                           {chatTime}
                         </span>
                       )}
@@ -347,56 +347,56 @@ export function FriendsSidebar({
                         onClick={(e) => togglePin('friends', friend.id, e)}
                         className={`p-1 rounded-lg transition touch-manipulation active:scale-90 ${
                           isPinned 
-                            ? 'text-indigo-400 bg-indigo-500/10' 
-                            : 'text-slate-600 hover:text-slate-300 hover:bg-slate-800'
+                            ? 'text-white bg-white/15' 
+                            : 'text-neutral-600 hover:text-neutral-300 hover:bg-neutral-800'
                         }`}
                         title={isPinned ? 'Открепить чат' : 'Закрепить чат'}
                       >
-                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-indigo-400' : ''}`} />
+                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-white' : ''}`} />
                       </button>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between gap-1 mt-0.5">
-                    <div className="text-xs text-slate-400 truncate flex-1 flex items-center gap-1 min-w-0">
+                    <div className="text-xs text-neutral-400 truncate flex-1 flex items-center gap-1 min-w-0">
                       {typingUsers && typingUsers[`direct_${friend.id}`] ? (
-                        <span className="text-indigo-400 font-medium flex items-center gap-1">
+                        <span className="text-white font-medium flex items-center gap-1">
                           <span>печатает</span>
                           <span className="inline-flex items-center gap-0.5">
-                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
-                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
-                            <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-1" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-2" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-3" />
                           </span>
                         </span>
                       ) : friend.last_caption || friend.last_file_url ? (
                         <>
                           {isLastMsgFromMe && (
-                            <span className="flex items-center gap-0.5 text-slate-400 shrink-0 font-medium text-[11px]">
+                            <span className="flex items-center gap-0.5 text-neutral-400 shrink-0 font-medium text-[11px]">
                               {Boolean(friend.last_is_read) ? (
-                                <CheckCheck className="w-3.5 h-3.5 text-sky-400 shrink-0" title="Прочитано" />
+                                <CheckCheck className="w-3.5 h-3.5 text-white shrink-0" title="Прочитано" />
                               ) : (
-                                <Check className="w-3.5 h-3.5 text-slate-500 shrink-0" title="Доставлено" />
+                                <Check className="w-3.5 h-3.5 text-neutral-500 shrink-0" title="Доставлено" />
                               )}
                               <span>Вы:</span>
                             </span>
                           )}
 
                           {friend.last_caption ? (
-                            <span className="text-slate-300 truncate">{friend.last_caption}</span>
+                            <span className="text-neutral-300 truncate">{friend.last_caption}</span>
                           ) : (
-                            <span className="text-indigo-400 flex items-center gap-1 truncate">
+                            <span className="text-neutral-300 flex items-center gap-1 truncate">
                               <ImageIcon className="w-3 h-3 inline shrink-0" />
                               <span>Фотография</span>
                             </span>
                           )}
                         </>
                       ) : (
-                        <span className="text-slate-500 italic text-[11px]">Пока нет сообщений</span>
+                        <span className="text-neutral-500 italic text-[11px]">Пока нет сообщений</span>
                       )}
                     </div>
 
                     {unreadCount > 0 && (
-                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-bold text-white bg-indigo-500 rounded-full shadow-md shrink-0 animate-badge-pop">
+                      <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-extrabold text-black bg-white rounded-full shadow-md shrink-0 animate-badge-pop">
                         {unreadCount}
                       </span>
                     )}
@@ -413,18 +413,18 @@ export function FriendsSidebar({
         <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar animate-tab-slide">
           {groups.length === 0 && (
             <div className="p-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl liquid-glass text-white border border-white/15 mx-auto flex items-center justify-center shadow-lg">
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-300">У вас пока нет групп</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-sm font-semibold text-neutral-200">У вас пока нет групп</p>
+                <p className="text-xs text-neutral-400 mt-1">
                   Создайте свою группу, чтобы делиться картинками сразу со всеми друзьями!
                 </p>
               </div>
               <button
                 onClick={onOpenCreateGroup}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition touch-manipulation active:scale-95"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl x-btn-primary text-xs font-bold shadow-md transition touch-manipulation active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Создать первую группу</span>
@@ -433,7 +433,7 @@ export function FriendsSidebar({
           )}
 
           {groups.length > 0 && filteredGroups.length === 0 && (
-            <div className="p-6 text-center text-xs text-slate-500">
+            <div className="p-6 text-center text-xs text-neutral-500">
               Группы не найдены
             </div>
           )}
@@ -449,21 +449,21 @@ export function FriendsSidebar({
                 onClick={() => onSelectGroup(grp)}
                 className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all touch-manipulation active:scale-[0.99] group ${
                   isSelected
-                    ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-sm'
+                    ? 'liquid-glass-highlight bg-white/10 border border-white/20 text-white shadow-sm'
                     : isPinned
-                    ? 'bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/40 text-slate-300'
-                    : 'hover:bg-slate-800/60 border border-transparent text-slate-300'
+                    ? 'bg-neutral-900/60 hover:bg-neutral-900/90 border border-white/10 text-neutral-300'
+                    : 'hover:bg-neutral-900/40 border border-transparent text-neutral-300'
                 }`}
               >
                 <div className="relative shrink-0">
                   <img
                     src={grp.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${grp.name}`}
                     alt={grp.name}
-                    className="w-11 h-11 rounded-2xl border border-indigo-500/30 object-cover bg-slate-800 shadow-sm"
+                    className="w-11 h-11 rounded-2xl border border-white/15 object-cover bg-neutral-900 shadow-sm"
                   />
                   {grp.is_creator === 1 && (
                     <span 
-                      className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow"
+                      className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-black flex items-center justify-center shadow font-bold"
                       title="Вы создатель этой группы"
                     >
                       <Crown className="w-2.5 h-2.5" />
@@ -473,13 +473,13 @@ export function FriendsSidebar({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="font-semibold text-sm truncate text-slate-200">
+                    <span className="font-semibold text-sm truncate text-neutral-100">
                       {grp.name}
                     </span>
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {chatTime && (
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-neutral-500">
                           {chatTime}
                         </span>
                       )}
@@ -490,47 +490,47 @@ export function FriendsSidebar({
                         onClick={(e) => togglePin('groups', grp.id, e)}
                         className={`p-1 rounded-lg transition touch-manipulation active:scale-90 ${
                           isPinned 
-                            ? 'text-indigo-400 bg-indigo-500/10' 
-                            : 'text-slate-600 hover:text-slate-300 hover:bg-slate-800'
+                            ? 'text-white bg-white/15' 
+                            : 'text-neutral-600 hover:text-neutral-300 hover:bg-neutral-800'
                         }`}
                         title={isPinned ? 'Открепить группу' : 'Закрепить группу'}
                       >
-                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-indigo-400' : ''}`} />
+                        <Pin className={`w-3.5 h-3.5 rotate-45 ${isPinned ? 'fill-white' : ''}`} />
                       </button>
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-400 truncate mt-0.5 flex items-center gap-1.5 min-w-0">
+                  <div className="text-xs text-neutral-400 truncate mt-0.5 flex items-center gap-1.5 min-w-0">
                     {Object.values(typingUsers || {}).some(
                       (t) => Number(t.groupId) === Number(grp.id) && Number(t.userId) !== Number(user?.id)
                     ) ? (
-                      <span className="text-indigo-400 font-medium flex items-center gap-1">
+                      <span className="text-white font-medium flex items-center gap-1">
                         <span>печатает</span>
                         <span className="inline-flex items-center gap-0.5">
-                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-1" />
-                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-2" />
-                          <span className="w-1 h-1 rounded-full bg-indigo-400 animate-typing-dot-3" />
+                          <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-1" />
+                          <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-2" />
+                          <span className="w-1 h-1 rounded-full bg-white animate-typing-dot-3" />
                         </span>
                       </span>
                     ) : grp.last_caption || grp.last_file_url ? (
                       <div className="flex items-center gap-1 min-w-0 truncate">
                         {Number(grp.last_sender_id) === Number(user?.id) ? (
-                          <span className="text-indigo-400 font-medium text-[11px] shrink-0">Вы:</span>
+                          <span className="text-white font-medium text-[11px] shrink-0">Вы:</span>
                         ) : grp.last_sender_username ? (
-                          <span className="text-indigo-300 font-medium text-[11px] shrink-0">{grp.last_sender_username}:</span>
+                          <span className="text-neutral-300 font-medium text-[11px] shrink-0">{grp.last_sender_username}:</span>
                         ) : null}
 
                         {grp.last_caption ? (
-                          <span className="text-slate-300 truncate">{grp.last_caption}</span>
+                          <span className="text-neutral-300 truncate">{grp.last_caption}</span>
                         ) : (
-                          <span className="text-indigo-400 flex items-center gap-1 truncate">
+                          <span className="text-neutral-300 flex items-center gap-1 truncate">
                             <ImageIcon className="w-3 h-3 inline shrink-0" />
                             <span>Фотография</span>
                           </span>
                         )}
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] truncate">
+                      <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] truncate">
                         <span>{grp.members_count || 1} {getMembersWord(grp.members_count || 1)}</span>
                         <span>•</span>
                         <span className="italic">Пока нет сообщений</span>

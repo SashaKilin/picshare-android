@@ -195,16 +195,16 @@ export function GroupInfoModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-xl animate-backdrop-fade">
       <div 
-        className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl max-h-[94dvh] sm:max-h-[90dvh] flex flex-col"
+        className="relative w-full max-w-lg liquid-glass-modal border border-white/15 rounded-3xl overflow-hidden shadow-2xl max-h-[94dvh] sm:max-h-[90dvh] flex flex-col animate-modal-spring"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Кнопка закрытия */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-950/60 hover:bg-slate-950 text-white backdrop-blur border border-white/10 transition shadow-lg active:scale-90 touch-manipulation"
+          className="absolute top-4 right-4 z-20 p-2.5 rounded-full liquid-glass-pill text-neutral-400 hover:text-white border border-white/10 hover:border-white/20 transition shadow-lg active:scale-90 touch-manipulation"
           title="Закрыть"
         >
           <X className="w-4 h-4" />
@@ -212,20 +212,20 @@ export function GroupInfoModal({
 
         {loading ? (
           <div className="p-16 flex flex-col items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center animate-spin">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-white flex items-center justify-center animate-spin">
               <Users className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xs text-slate-400 font-medium">Загрузка информации...</span>
+            <span className="text-xs text-neutral-400 font-medium">Загрузка информации...</span>
           </div>
         ) : error ? (
           <div className="p-10 text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 mx-auto flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
               <X className="w-6 h-6" />
             </div>
             <p className="text-sm font-semibold text-rose-300">{error}</p>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold"
+              className="x-btn-secondary px-5 py-2 rounded-full text-xs font-semibold"
             >
               Закрыть
             </button>
@@ -236,15 +236,15 @@ export function GroupInfoModal({
             {/* РЕЖИМ 1: РЕДАКТИРОВАНИЕ ДАННЫХ ГРУППЫ (ТОЛЬКО СОЗДАТЕЛЬ) */}
             {isEditing ? (
               <form onSubmit={handleSaveEdit} className="p-4 sm:p-6 space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <h3 className="font-bold text-base text-white flex items-center gap-2">
-                    <Edit3 className="w-4 h-4 text-indigo-400" />
+                    <Edit3 className="w-4 h-4 text-white" />
                     <span>Редактирование группы</span>
                   </h3>
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
-                    className="text-xs text-slate-400 hover:text-white"
+                    className="text-xs text-neutral-400 hover:text-white"
                   >
                     Отмена
                   </button>
@@ -252,7 +252,7 @@ export function GroupInfoModal({
 
                 {/* Аватарка */}
                 <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-20 rounded-3xl overflow-hidden border-2 border-indigo-500/50 bg-slate-800 shrink-0 shadow-lg group">
+                  <div className="relative w-20 h-20 rounded-3xl overflow-hidden border-2 border-white/20 bg-neutral-900 shrink-0 shadow-lg group">
                     <img src={editAvatar} alt="Group avatar" className="w-full h-full object-cover" />
                     <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer text-white">
                       <Camera className="w-6 h-6" />
@@ -266,12 +266,12 @@ export function GroupInfoModal({
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-xs font-semibold text-slate-200">
+                    <div className="text-xs font-semibold text-neutral-200">
                       Фото группы
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <label className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition cursor-pointer flex items-center gap-1.5 active:scale-95 touch-manipulation">
-                        <Camera className="w-3.5 h-3.5 text-indigo-400" />
+                      <label className="x-btn-secondary px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer flex items-center gap-1.5 active:scale-95 touch-manipulation">
+                        <Camera className="w-3.5 h-3.5 text-neutral-300" />
                         <span>{uploadingAvatar ? 'Загрузка...' : 'Загрузить фото'}</span>
                         <input
                           type="file"
@@ -283,9 +283,9 @@ export function GroupInfoModal({
                       <button
                         type="button"
                         onClick={handleDicebear}
-                        className="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-medium border border-indigo-500/30 transition flex items-center gap-1.5 active:scale-95 touch-manipulation"
+                        className="liquid-glass-pill px-3 py-1.5 rounded-full text-white text-xs font-semibold border border-white/15 hover:bg-white/15 transition flex items-center gap-1.5 active:scale-95 touch-manipulation"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5 text-neutral-300" />
                         <span>Сгенерировать</span>
                       </button>
                     </div>
@@ -294,7 +294,7 @@ export function GroupInfoModal({
 
                 {/* Название */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                     Название группы
                   </label>
                   <input
@@ -303,13 +303,13 @@ export function GroupInfoModal({
                     minLength={2}
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full bg-neutral-900/60 border border-white/10 rounded-2xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20"
                   />
                 </div>
 
                 {/* Описание */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                     Описание
                   </label>
                   <textarea
@@ -318,22 +318,22 @@ export function GroupInfoModal({
                     value={editDesc}
                     onChange={(e) => setEditDesc(e.target.value)}
                     placeholder="Описание группы..."
-                    className="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-3 text-base sm:text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+                    className="w-full bg-neutral-900/60 border border-white/10 rounded-2xl p-3.5 text-base sm:text-sm text-white focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 resize-none"
                   />
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2.5 pt-2">
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                    className="flex-1 py-3 rounded-full x-btn-secondary text-xs font-semibold"
                   >
                     Отмена
                   </button>
                   <button
                     type="submit"
                     disabled={savingEdit || !editName.trim()}
-                    className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md active:scale-95 transition"
+                    className="flex-1 py-3 rounded-full x-btn-primary text-xs font-bold transition active:scale-95"
                   >
                     {savingEdit ? 'Сохранение...' : 'Сохранить изменения'}
                   </button>
@@ -342,9 +342,9 @@ export function GroupInfoModal({
             ) : isAddingMembers ? (
               /* РЕЖИМ 2: ДОБАВЛЕНИЕ УЧАСТНИКОВ (ТОЛЬКО СОЗДАТЕЛЬ) */
               <div className="p-4 sm:p-6 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <h3 className="font-bold text-base text-white flex items-center gap-2">
-                    <UserPlus className="w-4 h-4 text-indigo-400" />
+                    <UserPlus className="w-4 h-4 text-white" />
                     <span>Добавить участников из друзей</span>
                   </h3>
                   <button
@@ -352,7 +352,7 @@ export function GroupInfoModal({
                       setIsAddingMembers(false);
                       setSelectedFriendIds([]);
                     }}
-                    className="text-xs text-slate-400 hover:text-white"
+                    className="text-xs text-neutral-400 hover:text-white"
                   >
                     Назад
                   </button>
@@ -360,24 +360,24 @@ export function GroupInfoModal({
 
                 {availableFriends.length > 4 && (
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-500" />
                     <input
                       type="text"
                       value={friendSearch}
                       onChange={(e) => setFriendSearch(e.target.value)}
                       placeholder="Поиск по друзьям..."
-                      className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      className="w-full bg-neutral-900/60 border border-white/10 rounded-full pl-9 pr-3.5 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20"
                     />
                   </div>
                 )}
 
-                <div className="max-h-60 overflow-y-auto space-y-1.5 p-1 bg-slate-800/30 rounded-2xl border border-slate-800 custom-scrollbar">
+                <div className="max-h-60 overflow-y-auto space-y-1.5 p-1.5 liquid-glass-subtle rounded-2xl border border-white/10 custom-scrollbar">
                   {availableFriends.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500">
+                    <div className="p-6 text-center text-xs text-neutral-400">
                       Все ваши друзья уже состоят в этой группе!
                     </div>
                   ) : filteredAvailableFriends.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500">
+                    <div className="p-6 text-center text-xs text-neutral-400">
                       Никого не найдено
                     </div>
                   ) : (
@@ -395,21 +395,21 @@ export function GroupInfoModal({
                           }}
                           className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition touch-manipulation ${
                             isSelected 
-                              ? 'bg-indigo-600/20 border border-indigo-500/40' 
-                              : 'hover:bg-slate-800/60 border border-transparent'
+                              ? 'bg-white/15 border border-white/25 text-white' 
+                              : 'hover:bg-white/5 border border-transparent text-neutral-300'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <img
                               src={friend.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${friend.username}`}
                               alt={friend.username}
-                              className="w-9 h-9 rounded-full border border-slate-700 object-cover shrink-0"
+                              className="w-9 h-9 rounded-full border border-white/15 object-cover shrink-0"
                             />
                             <div className="min-w-0 text-left">
-                              <div className="text-xs font-semibold text-slate-200 truncate">
+                              <div className="text-xs font-semibold text-neutral-100 truncate">
                                 {friend.username}
                               </div>
-                              <div className="text-[10px] text-slate-400 truncate">
+                              <div className="text-[10px] text-neutral-400 truncate">
                                 {friend.email}
                               </div>
                             </div>
@@ -417,8 +417,8 @@ export function GroupInfoModal({
 
                           <div className={`w-5 h-5 rounded-lg flex items-center justify-center border transition shrink-0 ${
                             isSelected 
-                              ? 'bg-indigo-600 border-indigo-500 text-white' 
-                              : 'border-slate-700 bg-slate-800 text-transparent'
+                              ? 'bg-white border-white text-black' 
+                              : 'border-white/20 bg-neutral-900 text-transparent'
                           }`}>
                             <Check className="w-3.5 h-3.5" />
                           </div>
@@ -428,20 +428,20 @@ export function GroupInfoModal({
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2.5 pt-2">
                   <button
                     onClick={() => {
                       setIsAddingMembers(false);
                       setSelectedFriendIds([]);
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                    className="flex-1 py-3 rounded-full x-btn-secondary text-xs font-semibold"
                   >
                     Отмена
                   </button>
                   <button
                     onClick={handleAddMembersSubmit}
                     disabled={addingLoading || selectedFriendIds.length === 0}
-                    className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md active:scale-95 transition disabled:opacity-50"
+                    className="flex-1 py-3 rounded-full x-btn-primary text-xs font-bold transition active:scale-95 disabled:opacity-50"
                   >
                     {addingLoading ? 'Добавление...' : `Добавить (${selectedFriendIds.length})`}
                   </button>
@@ -451,12 +451,12 @@ export function GroupInfoModal({
               /* РЕЖИМ 3: ПРОСМОТР ИНФОРМАЦИИ И СПИСКА УЧАСТНИКОВ */
               <div>
                 {/* Карточка шапки группы */}
-                <div className="p-5 sm:p-6 bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border-b border-slate-800 text-center relative">
+                <div className="p-5 sm:p-6 bg-gradient-to-b from-neutral-900/60 via-black to-black border-b border-white/10 text-center relative">
                   <div className="relative inline-block mb-3">
                     <img
                       src={group.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${group.name}`}
                       alt={group.name}
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl border-3 border-indigo-500/50 object-cover bg-slate-800 shadow-xl mx-auto"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl border-3 border-white/20 object-cover bg-neutral-900 shadow-2xl mx-auto"
                     />
                   </div>
 
@@ -465,13 +465,13 @@ export function GroupInfoModal({
                   </h2>
 
                   {group.description && (
-                    <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-sm mx-auto leading-relaxed whitespace-pre-wrap">
+                    <p className="mt-2 text-xs sm:text-sm text-neutral-300 max-w-sm mx-auto leading-relaxed whitespace-pre-wrap">
                       {group.description}
                     </p>
                   )}
 
-                  <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-400">
-                    <span className="font-semibold text-indigo-400">{members.length} участников</span>
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs text-neutral-400">
+                    <span className="font-semibold text-white">{members.length} участников</span>
                     <span>•</span>
                     <span>Создана {new Date(group.created_at).toLocaleDateString('ru-RU')}</span>
                   </div>
@@ -481,14 +481,14 @@ export function GroupInfoModal({
                     <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 active:scale-95 transition touch-manipulation"
+                        className="x-btn-secondary px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition touch-manipulation"
                       >
-                        <Edit3 className="w-3.5 h-3.5 text-indigo-400" />
+                        <Edit3 className="w-3.5 h-3.5 text-neutral-300" />
                         <span>Редактировать</span>
                       </button>
                       <button
                         onClick={() => setIsAddingMembers(true)}
-                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md flex items-center gap-1.5 active:scale-95 transition touch-manipulation"
+                        className="x-btn-primary px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 active:scale-95 transition touch-manipulation"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         <span>Добавить участника</span>
@@ -500,12 +500,12 @@ export function GroupInfoModal({
                 {/* Список участников */}
                 <div className="p-4 sm:p-6 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-indigo-400" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-white" />
                       <span>Участники ({members.length})</span>
                     </h4>
                     {isCreator && (
-                      <span className="text-[11px] text-indigo-400">
+                      <span className="text-xs text-neutral-400 font-medium">
                         Вы — создатель группы
                       </span>
                     )}
@@ -520,7 +520,7 @@ export function GroupInfoModal({
                       return (
                         <div
                           key={member.id}
-                          className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/40 hover:bg-slate-800/70 border border-slate-800 transition"
+                          className="flex items-center justify-between p-2.5 rounded-2xl liquid-glass-subtle border border-white/10 hover:border-white/20 transition"
                         >
                           <div 
                             onClick={() => {
@@ -534,32 +534,32 @@ export function GroupInfoModal({
                               <img
                                 src={member.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${member.username}`}
                                 alt={member.username}
-                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-700 object-cover bg-slate-800 group-hover:border-indigo-400"
+                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/15 object-cover bg-neutral-900 group-hover:border-white/40"
                               />
                               <span
-                                className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-900 ${
-                                  isOnline ? 'bg-emerald-500' : 'bg-slate-600'
+                                className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-black ${
+                                  isOnline ? 'bg-emerald-400 ring-1 ring-emerald-400/40' : 'bg-neutral-600'
                                 }`}
                               />
                             </div>
 
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-xs sm:text-sm text-slate-200 truncate group-hover:text-indigo-300">
+                                <span className="font-semibold text-xs sm:text-sm text-neutral-200 truncate group-hover:text-white">
                                   {member.username}
                                 </span>
                                 {isMe && (
-                                  <span className="text-[10px] text-slate-400 font-normal">(вы)</span>
+                                  <span className="text-[10px] text-neutral-400 font-normal">(вы)</span>
                                 )}
                                 {isMemberCreator && (
-                                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
-                                    <Crown className="w-3 h-3 text-amber-400" />
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full liquid-glass-pill text-white text-[10px] font-bold border border-white/20">
+                                    <Crown className="w-3 h-3 text-white" />
                                     <span>Создатель</span>
                                   </span>
                                 )}
                               </div>
                               {member.badge && (
-                                <div className="text-[10px] text-indigo-400 truncate mt-0.5">
+                                <div className="text-[10px] text-neutral-400 truncate mt-0.5">
                                   {member.badge}
                                 </div>
                               )}
@@ -571,7 +571,7 @@ export function GroupInfoModal({
                             {isCreator && !isMemberCreator && (
                               <button
                                 onClick={() => handleRemoveMember(member.id, member.username)}
-                                className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition active:scale-95 touch-manipulation"
+                                className="p-1.5 rounded-full liquid-glass-pill text-neutral-400 hover:text-rose-400 hover:border-rose-500/30 transition active:scale-95 touch-manipulation"
                                 title="Исключить из группы"
                               >
                                 <UserMinus className="w-4 h-4" />
@@ -584,11 +584,11 @@ export function GroupInfoModal({
                   </div>
 
                   {/* Нижние опасные действия: Выйти или Удалить */}
-                  <div className="pt-4 border-t border-slate-800/80 space-y-2">
+                  <div className="pt-4 border-t border-white/10 space-y-2">
                     {isCreator ? (
                       <button
                         onClick={handleDeleteGroup}
-                        className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 flex items-center justify-center gap-1.5 transition active:scale-95 touch-manipulation"
+                        className="w-full py-3 rounded-full liquid-glass text-rose-400 hover:text-rose-300 text-xs font-semibold border border-rose-500/20 hover:border-rose-500/40 hover:bg-rose-500/10 flex items-center justify-center gap-1.5 transition active:scale-95 touch-manipulation"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Удалить группу</span>
@@ -596,7 +596,7 @@ export function GroupInfoModal({
                     ) : (
                       <button
                         onClick={handleLeave}
-                        className="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 flex items-center justify-center gap-1.5 transition active:scale-95 touch-manipulation"
+                        className="w-full py-3 rounded-full liquid-glass text-rose-400 hover:text-rose-300 text-xs font-semibold border border-rose-500/20 hover:border-rose-500/40 hover:bg-rose-500/10 flex items-center justify-center gap-1.5 transition active:scale-95 touch-manipulation"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Покинуть группу</span>

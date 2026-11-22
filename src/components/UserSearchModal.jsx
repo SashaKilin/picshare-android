@@ -43,7 +43,6 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
         confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
       }
 
-      // Обновляем статус в локальном списке результатов
       setResults(prev => prev.map(u => {
         if (u.id === targetUser.id) {
           return {
@@ -70,13 +69,13 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl max-h-[92dvh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xl animate-backdrop-fade">
+      <div className="relative w-full max-w-lg liquid-glass-modal border border-white/15 rounded-3xl p-5 sm:p-6 shadow-2xl max-h-[92dvh] flex flex-col animate-modal-spring">
         
         {/* Кнопка закрытия */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+          className="absolute top-5 right-5 p-2 rounded-full liquid-glass-pill text-neutral-400 hover:text-white border border-white/10 hover:border-white/20 transition active:scale-90"
         >
           <X className="w-5 h-5" />
         </button>
@@ -84,58 +83,58 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
         {/* Заголовок */}
         <div className="mb-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-indigo-400" />
+            <UserPlus className="w-5 h-5 text-white" />
             <span>Поиск друзей</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-neutral-400 mt-1">
             Найдите пользователя по никнейму или email адресу, чтобы обмениваться картинками
           </p>
         </div>
 
         {/* Поле поиска */}
         <div className="relative mb-4">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
           <input
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Введите никнейм или почту..."
-            className="w-full bg-slate-800/80 border border-slate-700 rounded-2xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full bg-neutral-900/60 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition"
           />
         </div>
 
         {/* Информационные сообщения */}
         {actionMessage && (
-          <div className="mb-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+          <div className="mb-3 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
             <Check className="w-4 h-4 shrink-0 text-emerald-400" />
             <span>{actionMessage}</span>
           </div>
         )}
 
         {error && (
-          <div className="mb-3 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+          <div className="mb-3 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Результаты поиска */}
-        <div className="max-h-[360px] overflow-y-auto space-y-2 pr-1">
+        <div className="max-h-[360px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
           {loading && (
-            <div className="text-center py-8 text-xs text-slate-500 animate-pulse">
+            <div className="text-center py-8 text-xs text-neutral-400 animate-pulse">
               Поиск пользователей...
             </div>
           )}
 
           {!loading && query.length >= 2 && results.length === 0 && (
-            <div className="text-center py-8 text-slate-500 text-xs">
+            <div className="text-center py-8 text-neutral-400 text-xs">
               Пользователи по запросу «{query}» не найдены
             </div>
           )}
 
           {!loading && query.length < 2 && (
-            <div className="text-center py-8 text-slate-500 text-xs">
+            <div className="text-center py-8 text-neutral-500 text-xs">
               Введите хотя бы 2 символа для начала поиска
             </div>
           )}
@@ -143,7 +142,7 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
           {results.map((user) => (
             <div
               key={user.id}
-              className="flex items-center justify-between p-3 rounded-2xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition"
+              className="flex items-center justify-between p-3 rounded-2xl liquid-glass-subtle border border-white/10 hover:border-white/20 transition"
             >
               <div 
                 onClick={() => {
@@ -157,13 +156,13 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
                 <img
                   src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}`}
                   alt={user.username}
-                  className="w-10 h-10 rounded-full border border-slate-700 object-cover bg-slate-800 shrink-0 group-hover:border-indigo-400"
+                  className="w-10 h-10 rounded-full border border-white/15 object-cover bg-neutral-900 shrink-0 group-hover:border-white/40"
                 />
                 <div className="min-w-0">
-                  <div className="font-semibold text-sm text-slate-200 truncate group-hover:text-indigo-300">
+                  <div className="font-semibold text-sm text-neutral-100 truncate group-hover:text-white">
                     {user.username}
                   </div>
-                  <div className="text-xs text-slate-400 truncate">
+                  <div className="text-xs text-neutral-400 truncate">
                     {user.email}
                   </div>
                 </div>
@@ -177,7 +176,7 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
                       onSelectFriend(user);
                       onClose();
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold transition"
+                    className="x-btn-secondary flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Чат</span>
@@ -185,16 +184,16 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
                 )}
 
                 {user.relationship === 'outgoing_request' && (
-                  <span className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-700/60 text-slate-400 text-xs font-medium border border-slate-600/50">
+                  <span className="flex items-center gap-1 px-3 py-1.5 rounded-full liquid-glass text-neutral-400 text-xs font-medium border border-white/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>Заявка отправлена</span>
+                    <span>Отправлена</span>
                   </span>
                 )}
 
                 {user.relationship === 'incoming_request' && (
                   <button
                     onClick={() => handleAccept(user)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/30 transition"
+                    className="x-btn-primary flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold"
                   >
                     <UserCheck className="w-3.5 h-3.5" />
                     <span>Принять</span>
@@ -204,7 +203,7 @@ export function UserSearchModal({ isOpen, onClose, onSelectFriend, onOpenProfile
                 {user.relationship === 'none' && (
                   <button
                     onClick={() => handleSendRequest(user)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition transform active:scale-95"
+                    className="x-btn-primary flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                     <span>Добавить</span>

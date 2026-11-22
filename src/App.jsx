@@ -468,7 +468,8 @@ function MainApp() {
   }
 
   return (
-    <div className="fixed inset-0 w-full h-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden select-none">
+    <div className="fixed inset-0 w-full h-full flex flex-col bg-black text-neutral-100 font-sans overflow-hidden select-none">
+      <div className="liquid-ambient-bg" />
       
       {/* Навигационная панель (Шапка сайта):
           - На компьютерах видна всегда
@@ -544,25 +545,25 @@ function MainApp() {
                   />
                 </div>
               ) : (
-                <div className="flex-1 min-h-0 hidden md:flex flex-col items-center justify-center text-center p-8 bg-slate-950 h-full overflow-hidden">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4">
+                <div className="flex-1 min-h-0 hidden md:flex flex-col items-center justify-center text-center p-8 bg-black h-full overflow-hidden">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl liquid-glass text-white flex items-center justify-center mb-4 border border-white/15 shadow-xl">
                     <Images className="w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-white">Выберите чат или группу</h3>
-                  <p className="text-xs text-slate-400 max-w-md mt-2">
+                  <p className="text-xs text-neutral-400 max-w-md mt-2">
                     Выберите друга или группу из списка слева, либо создайте новую группу для совместного общения.
                   </p>
                   <div className="flex items-center gap-3 mt-6">
                     <button
                       onClick={() => setIsSearchOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-slate-700 transition"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-2xl x-btn-secondary font-semibold text-xs transition"
                     >
                       <UserPlus className="w-4 h-4" />
                       <span>Найти друзей</span>
                     </button>
                     <button
                       onClick={() => setIsCreateGroupOpen(true)}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:scale-95"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-2xl x-btn-primary font-bold text-xs transition active:scale-95"
                     >
                       <Users className="w-4 h-4" />
                       <span>Создать группу</span>
@@ -578,26 +579,26 @@ function MainApp() {
         <main className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center p-4 sm:p-8">
           <div className="max-w-4xl w-full text-center py-6 sm:py-12 px-2 sm:px-4">
             
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-6 animate-pulse">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full liquid-glass-pill text-white text-xs font-semibold mb-6 animate-pulse">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               <span>Безопасный обмен фото и картинками</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">
               Делитесь картинками <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
                 только со своими друзьями
               </span>
             </h1>
 
-            <p className="mt-4 text-sm sm:text-lg text-slate-400 max-w-2xl mx-auto px-2">
+            <p className="mt-4 text-sm sm:text-lg text-neutral-400 max-w-2xl mx-auto px-2">
               Никаких публичных лент и спама. Добавляйте друг друга в друзья и отправляйте картинки, мемы и арты в приватных диалогах.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition active:scale-95 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl x-btn-primary font-bold text-sm shadow-xl transition active:scale-95 flex items-center justify-center gap-2"
               >
                 <span>Начать прямо сейчас</span>
                 <ArrowRight className="w-4 h-4" />
@@ -606,32 +607,32 @@ function MainApp() {
 
             {/* Карточки фич */}
             <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-left">
-              <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3 sm:mb-4">
+              <div className="p-5 sm:p-6 rounded-3xl liquid-glass-subtle border border-white/10 hover:border-white/20 transition">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl liquid-glass text-white flex items-center justify-center mb-3 sm:mb-4 border border-white/15">
                   <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <h3 className="font-bold text-white text-sm sm:text-base">Быстрый старт</h3>
-                <p className="text-xs text-slate-400 mt-1 sm:mt-2 leading-relaxed">
+                <p className="text-xs text-neutral-400 mt-1 sm:mt-2 leading-relaxed">
                   Регистрация по почте без кодов подтверждения или вход в один клик через Google аккаунт.
                 </p>
               </div>
 
-              <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-3 sm:mb-4">
+              <div className="p-5 sm:p-6 rounded-3xl liquid-glass-subtle border border-white/10 hover:border-white/20 transition">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl liquid-glass text-white flex items-center justify-center mb-3 sm:mb-4 border border-white/15">
                   <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <h3 className="font-bold text-white text-sm sm:text-base">Взаимная дружба</h3>
-                <p className="text-xs text-slate-400 mt-1 sm:mt-2 leading-relaxed">
+                <p className="text-xs text-neutral-400 mt-1 sm:mt-2 leading-relaxed">
                   Отправлять и получать картинки можно строго после обоюдного согласия и добавления в друзья.
                 </p>
               </div>
 
-              <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center mb-3 sm:mb-4">
+              <div className="p-5 sm:p-6 rounded-3xl liquid-glass-subtle border border-white/10 hover:border-white/20 transition">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl liquid-glass text-white flex items-center justify-center mb-3 sm:mb-4 border border-white/15">
                   <FileImage className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <h3 className="font-bold text-white text-sm sm:text-base">Удобный обмен</h3>
-                <p className="text-xs text-slate-400 mt-1 sm:mt-2 leading-relaxed">
+                <p className="text-xs text-neutral-400 mt-1 sm:mt-2 leading-relaxed">
                   Съемка с камеры телефона, Drag & Drop, полноэкранный Lightbox и моментальная доставка картинок.
                 </p>
               </div>
